@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Divyakush Punjabi - Resume</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom CSS for CRED-like accent line and specific overrides */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background-color: #ff5e62; /* Accent color */
+            margin-top: 0.5rem;
+            border-radius: 9999px; /* Fully rounded */
+        }
+        .list-marker::before {
+            content: '›';
+            position: absolute;
+            left: 0;
+            color: #ff5e62; /* Accent color */
+            font-weight: bold;
+            font-size: 1.2em;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-100 antialiased p-4 sm:p-6 lg:p-8">
+    <div class="container mx-auto my-8 p-6 sm:p-8 bg-gray-800 shadow-xl rounded-xl max-w-4xl">
+
+        <header class="flex flex-col-reverse sm:flex-row items-center sm:items-start justify-between pb-6 mb-6 border-b border-gray-700">
+            <div class="text-center sm:text-left sm:mr-8 mt-6 sm:mt-0">
+                <h1 class="text-4xl sm:text-5xl font-extrabold text-white mb-1 leading-tight">Divyakush Punjabi</h1>
+                <h2 class="text-xl sm:text-2xl text-red-400 font-medium mb-4">Software Developer</h2>
+                <p class="text-sm sm:text-base text-gray-400 leading-relaxed">
+                    A passionate Software Developer with a strong foundation in Python, C++, Java, and UI/UX design.
+                    Pursuing B.Tech in Computer Science at VIT Vellore and a Minor in AI at IIT Ropar.
+                    Passionate about software development, artificial intelligence, and building intuitive digital experiences.
+                    Experienced in API integration, team leadership, and cross-functional project execution.
+                    Finalist at GDSC Dev Jams and campus ambassador at IIT Bombay NEC.
+                    Certified in Software Development, Generative AI, and Project Management.
+                </p>
+            </div>
+            <img src="my profile pic.png" alt="Profile Picture" class="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-red-400 shadow-lg">
+        </header>
+
+        <section class="mb-8 pt-6 border-b border-gray-700 last:border-b-0">
+            <h3 class="text-2xl sm:text-3xl font-bold text-white mb-4 section-title">Experience</h3>
+            <div class="job-entry mb-6">
+                <h4 class="text-lg sm:text-xl font-semibold text-white">UI/UX Designer <span class="text-sm text-gray-400 font-normal ml-2">(3 Months)</span></h4>
+                <p class="text-base italic text-gray-400 mb-2">LayOver (Remote)</p>
+                <ul class="list-none pl-0">
+                    <li class="relative pl-6 text-gray-300 mb-2 list-marker">Designing intuitive and user-friendly interfaces to enhance digital experiences.</li>
+                    <li class="relative pl-6 text-gray-300 mb-2 list-marker">Conducting user research and usability testing to refine product designs.</li>
+                    <li class="relative pl-6 text-gray-300 mb-2 list-marker">Creating wireframes, prototypes, and high-fidelity UI designs using Figma.</li>
+                    <li class="relative pl-6 text-gray-300 mb-2 list-marker">Collaborating with developers to ensure seamless design implementation.</li>
+                    <li class="relative pl-6 text-gray-300 mb-2 list-marker">Improving design accessibility and responsiveness for various devices.</li>
+                </ul>
+            </div>
+            <div class="job-entry mb-6">
+                <h4 class="text-lg sm:text-xl font-semibold text-white">Campus Ambassador <span class="text-sm text-gray-400 font-normal ml-2">(6 Months)</span></h4>
+                <p class="text-base italic text-gray-400 mb-2">E-Cell IIT Bombay - National Entrepreneurship Challenge</p>
+                <ul class="list-none pl-0">
+                    <li class="relative pl-6 text-gray-300 mb-2 list-marker">Team Leadership: Led team Visionary Ventures in the National Entrepreneurship Challenge, representing VIT Vellore.</li>
+                    <li class="relative pl-6 text-gray-300 mb-2 list-marker">Event Coordination: Organized outreach campaigns, mentorship sessions, and entrepreneurship-focused workshops.</li>
+                    <li class="relative pl-6 text-gray-300 mb-2 list-marker">Task Management: Oversaw and delegated multiple project tasks, ensuring timely and high-quality submissions.</li>
+                    <li class="relative pl-6 text-gray-300 mb-2 list-marker">Community Engagement: Built connections with student communities to promote participation and initiative awareness.</li>
+                    <li class="relative pl-6 text-gray-300 mb-2 list-marker">Impact: Contributed to team progression through strategic planning, collaboration, and consistent execution.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="mb-8 pt-6 border-b border-gray-700 last:border-b-0">
+            <h3 class="text-2xl sm:text-3xl font-bold text-white mb-4 section-title">Projects</h3>
+            <div class="project-entry mb-6">
+                <h4 class="text-lg sm:text-xl font-semibold text-white">AI-Based Voice-Activated Home Automation System</h4>
+                <p class="text-base italic text-gray-400 mb-2">Vellore Institute of Technology</p>
+                <ul class="list-none pl-0">
+                    <li class="relative pl-6 text-gray-300 mb-2 list-marker">Voice Control System: Developed a voice-activated home automation system enabling hands-free appliance control.</li>
+                    <li class="relative pl-6 text-gray-300 mb-2 list-marker">Smart Assistant: Integrated Google Gemini API for real-time personal assistance with natural language understanding.</li>
+                    <li class="relative pl-6 text-gray-300 mb-2 list-marker">Music Playback: Used Spotify API to enable seamless, voice-controlled music streaming.</li>
+                    <li class="relative pl-6 text-gray-300 mb-2 list-marker">Tech Stack: Python, C++, Arduino Uno, Google Gemini API, Spotify API.</li>
+                    <li class="relative pl-6 text-gray-300 mb-2 list-marker">Recognition: Ranked among the top 13 teams out of 250+ in the GDSC Dev Jams hackathon.</li>
+                    <li class="relative pl-6 text-gray-300 mb-2 list-marker">Challenges Overcome: Solved module compatibility and hardware integration issues through iterative testing.</li>
+                    <li class="relative pl-6 text-gray-300 mb-2 list-marker">Future Scope: Plans for UI frontend, temperature sensors, and task management module.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="mb-8 pt-6 border-b border-gray-700 last:border-b-0">
+            <h3 class="text-2xl sm:text-3xl font-bold text-white mb-4 section-title">Skills</h3>
+            <div class="flex flex-wrap gap-3">
+                <span class="skill-tag bg-gray-700 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-red-500 transition-colors duration-200 cursor-pointer">C++</span>
+                <span class="skill-tag bg-gray-700 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-red-500 transition-colors duration-200 cursor-pointer">C Programming</span>
+                <span class="skill-tag bg-gray-700 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-red-500 transition-colors duration-200 cursor-pointer">Python</span>
+                <span class="skill-tag bg-gray-700 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-red-500 transition-colors duration-200 cursor-pointer">Java</span>
+                <span class="skill-tag bg-gray-700 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-red-500 transition-colors duration-200 cursor-pointer">Machine Learning</span>
+                <span class="skill-tag bg-gray-700 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-red-500 transition-colors duration-200 cursor-pointer">Deep Learning</span>
+                <span class="skill-tag bg-gray-700 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-red-500 transition-colors duration-200 cursor-pointer">Team Leadership and Collaboration</span>
+                <span class="skill-tag bg-gray-700 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-red-500 transition-colors duration-200 cursor-pointer">Team Management</span>
+                <span class="skill-tag bg-gray-700 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-red-500 transition-colors duration-200 cursor-pointer">Teamwork</span>
+                <span class="skill-tag bg-gray-700 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-red-500 transition-colors duration-200 cursor-pointer">Time Management</span>
+                <span class="skill-tag bg-gray-700 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-red-500 transition-colors duration-200 cursor-pointer">Project Management</span>
+                <span class="skill-tag bg-gray-700 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-red-500 transition-colors duration-200 cursor-pointer">Effective Communication</span>
+                <span class="skill-tag bg-gray-700 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-red-500 transition-colors duration-200 cursor-pointer">Critical Thinking</span>
+                <span class="skill-tag bg-gray-700 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-red-500 transition-colors duration-200 cursor-pointer">Problem Solving and Analytical thinking</span>
+            </div>
+        </section>
+
+        <section class="mb-8 pt-6 border-b border-gray-700 last:border-b-0">
+            <h3 class="text-2xl sm:text-3xl font-bold text-white mb-4 section-title">Education</h3>
+            <div class="education-entry mb-6">
+                <h4 class="text-lg sm:text-xl font-semibold text-white">B.Tech Computer Science (BIOINFORMATICS) <span class="text-sm text-gray-400 font-normal ml-2">(2024-2028)</span></h4>
+                <p class="text-base italic text-gray-400 mb-2">VIT University, Vellore</p>
+            </div>
+            <div class="education-entry mb-6">
+                <h4 class="text-lg sm:text-xl font-semibold text-white">Minor in AI <span class="text-sm text-gray-400 font-normal ml-2">(2024-2026)</span></h4>
+                <p class="text-base italic text-gray-400 mb-2">Indian Institute of Technology, Ropar</p>
+            </div>
+        </section>
+
+        <section class="mb-8 pt-6 border-b border-gray-700 last:border-b-0">
+            <h3 class="text-2xl sm:text-3xl font-bold text-white mb-4 section-title">Achievements</h3>
+            <ul class="list-none pl-0">
+                <li class="relative pl-6 text-gray-300 mb-2 list-marker">Secured a spot among the top 13 teams out of 250+ participating teams at GDSC Dev Jams!</li>
+                <li class="relative pl-6 text-gray-300 mb-2 list-marker">Led the team Visionary Ventures representing Vit Vellore at NEC IIT BOMBAY (All India Rank 140)</li>
+            </ul>
+        </section>
+
+        <section class="mb-8 pt-6 border-b border-gray-700 last:border-b-0">
+            <h3 class="text-2xl sm:text-3xl font-bold text-white mb-4 section-title">Certifications</h3>
+            <ul class="list-none pl-0">
+                <li class="relative pl-6 text-gray-300 mb-2 list-marker">Microsoft Certification: Career Essentials in Software Development</li>
+                <li class="relative pl-6 text-gray-300 mb-2 list-marker">Microsoft Certification: Build your Generative AI Productivity Skills</li>
+                <li class="relative pl-6 text-gray-300 mb-2 list-marker">National Association of State Boards of Accountancy (NASBA): Project Management Foundations</li>
+            </ul>
+        </section>
+
+        <section class="mb-8 pt-6">
+            <h3 class="text-2xl sm:text-3xl font-bold text-white mb-4 section-title">Contact</h3>
+            <div class="contact text-gray-300">
+                <p class="mb-1">Email: <a href="mailto:divyakushpunjabi@gmail.com" class="text-red-400 hover:text-red-300 font-medium transition-colors duration-200">divyakushpunjabi@gmail.com</a></p>
+                <p class="mb-1">LinkedIn: <a href="https://linkedin.com/in/divyakush-punjabi" target="_blank" class="text-red-400 hover:text-red-300 font-medium transition-colors duration-200">linkedin.com/in/divyakush-punjabi</a></p>
+                <p class="mb-1">Address: VIT Vellore Men's Hostel, Vit University, Vellore-632014</p>
+            </div>
+        </section>
+
+        <footer class="mt-10 pt-6 text-center text-sm text-gray-500 border-t border-gray-700">
+            <p>&copy; 2025 Divyakush Punjabi. All rights reserved.</p>
+        </footer>
+
+    </div>
+</body>
+</html>
