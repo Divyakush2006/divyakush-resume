@@ -1,0 +1,17 @@
+{
+  "name": "Divyakush Punjabi - Full Stack Developer & AI Enthusiast",
+  "short_name": "Divyakush Punjabi",
+  "description": "Professional resume and portfolio of Divyakush Punjabi - Full Stack Developer specializing in React, TypeScript, and AI-driven solutions.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#C9A96E",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
