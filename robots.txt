@@ -3,4 +3,4 @@ Allow: /
 Disallow: /node_modules/
 Disallow: /dist/
 
-Sitemap: https://divyakush.com/sitemap.xml
+Sitemap: https://www.divyakush.com/sitemap.xml
