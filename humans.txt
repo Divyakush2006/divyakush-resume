@@ -1,0 +1,14 @@
+/* TEAM */
+    Name:     Divyakush Punjabi
+    Role:     Software Engineering Lead — Full-Stack & AI
+    Site:     https://www.divyakush.com
+    GitHub:   https://github.com/Divyakush2006
+    LinkedIn: https://linkedin.com/in/divyakush-punjabi
+    Email:    divyakushpunjabi@gmail.com
+    Location: Vellore, Tamil Nadu, India
+
+/* SITE */
+    Last updated: 2026-07-28
+    Standards:    HTML5, CSS3, JSON-LD, WAI-ARIA
+    Components:   React, TypeScript, Vite, Tailwind CSS, motion
+    Hosting:      Vercel

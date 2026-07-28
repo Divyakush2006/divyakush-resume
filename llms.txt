@@ -1,0 +1,41 @@
+# Divyakush Punjabi
+
+> Software Engineering Lead at LMX Labs and full-stack developer specialising in React, TypeScript, Python, and AI-driven systems. B.Tech in Computer Engineering at VIT Vellore with a Major in Artificial Intelligence from IIT Ropar. Based in Vellore, Tamil Nadu, India.
+
+Divyakush Punjabi (also written "Divyakush") builds production web platforms and applied-AI systems end to end — from consumer marketplaces with live payments to edge-AI surveillance and machine-learning hazard prediction. This file is a concise, structured summary for language models and AI search engines. The canonical site is https://www.divyakush.com.
+
+## Profile
+
+- **Name:** Divyakush Punjabi
+- **Role:** Software Engineering Lead, LMX Labs
+- **Focus:** Full-stack engineering (React, TypeScript, Next.js, Node.js) and applied AI (Python, FastAPI, PyTorch, machine learning, deep learning, recommender systems, RAG, AI governance)
+- **Education:** B.Tech Computer Engineering — VIT Vellore; Major in Artificial Intelligence — IIT Ropar
+- **Location:** Vellore, Tamil Nadu, India
+
+## Experience
+
+- **Software Engineering Lead — LMX Labs** (Jun 2026 – Present): Sole technical lead across two live platforms, Saturdays and DineGuru; owns architecture and directs a student engineering team.
+- **Web Developer Intern — GovernAI** (May 2026 – Jul 2026): Built Research Atlas, an open-source AI-governance research discovery platform, and owned the frontend for GovernAI Studio.
+- **Web Developer — VUBS Corporation (BASF Authorised Channel Partner)** (Dec 2025 – Feb 2026): Sole engineer on a responsive corporate site with a technical SEO strategy that outranked established competitors.
+- **UI/UX Engineering Intern — LayOver** (Mar 2025 – Jul 2025).
+- **NEC Team Lead — E-Cell, IIT Bombay** (Aug 2024 – Feb 2025): Led team Visionary Ventures to All India Rank 140 in the National Entrepreneurship Challenge.
+
+## Projects
+
+- [Saturdays](https://saturdays.co.in): Consumer food-delivery marketplace with Stripe and PhonePe payments, built and led end to end. TypeScript, React, Node.js.
+- [DineGuru](https://dineguru.in): Multi-tenant restaurant operations platform on FastAPI and PostgreSQL.
+- [GovernAI Research Atlas](https://github.com/divyakush2006/GAI-Research-Atlas): Open-source semantic discovery platform for AI-governance research (built at GovernAI). Python, React.
+- [AI Rockfall Detection and Prevention](https://github.com/Divyakush2006/AI-ROCKFALL-DETECTION-AND-PREVENTION): Smart India Hackathon 2025 shortlisted system for rockfall prediction using machine learning. Python.
+- [Netra](https://github.com/divyakush2006/Netra): Edge-AI surveillance with ESP32-CAM and YOLOv8 (person tracking, anomaly scoring, patrol heat-maps over MQTT). Python, C++, FastAPI, React.
+- [AlgoVerse](https://github.com/divyakush2006/AlgoVerse): Interactive data-structures and algorithms visualisation platform. TypeScript, React, Three.js.
+
+## Skills
+
+Full-Stack Development, React, TypeScript, JavaScript, Next.js, Python, FastAPI, Node.js, Machine Learning, Deep Learning, PyTorch, TensorFlow, Recommender Systems, Retrieval-Augmented Generation, AI Governance, PostgreSQL, Docker, Tailwind CSS, Software Architecture.
+
+## Links
+
+- Portfolio: https://www.divyakush.com
+- GitHub: https://github.com/Divyakush2006
+- LinkedIn: https://linkedin.com/in/divyakush-punjabi
+- Email: divyakushpunjabi@gmail.com
