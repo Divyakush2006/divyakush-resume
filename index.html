@@ -95,150 +95,283 @@
 
     <!-- Structured Data — entity definition for search engines -->
     <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
     {
-      "@context": "https://schema.org",
-      "@graph": [
+      "@type": "Person",
+      "@id": "https://www.divyakush.com/#person",
+      "name": "Divyakush Punjabi",
+      "givenName": "Divyakush",
+      "familyName": "Punjabi",
+      "url": "https://www.divyakush.com/",
+      "image": {
+        "@type": "ImageObject",
+        "url": "https://www.divyakush.com/profile.jpg",
+        "caption": "Divyakush Punjabi"
+      },
+      "email": "divyakushpunjabi@gmail.com",
+      "jobTitle": "Software Engineering Lead",
+      "description": "Software Engineering Lead at LMX Labs. Full stack developer specialising in React, TypeScript, Python and AI-driven systems. B.Tech Computer Engineering at VIT Vellore with a Major in Artificial Intelligence from IIT Ropar.",
+      "nationality": {
+        "@type": "Country",
+        "name": "India"
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Vellore",
+        "addressRegion": "Tamil Nadu",
+        "addressCountry": "IN"
+      },
+      "worksFor": {
+        "@id": "https://www.divyakush.com/#lmxlabs"
+      },
+      "alumniOf": [
         {
-          "@type": "Person",
-          "@id": "https://www.divyakush.com/#person",
-          "name": "Divyakush Punjabi",
-          "givenName": "Divyakush",
-          "familyName": "Punjabi",
-          "url": "https://www.divyakush.com/",
-          "image": "https://www.divyakush.com/profile.jpg",
-          "email": "divyakushpunjabi@gmail.com",
-          "jobTitle": "Software Engineering Lead",
-          "description": "Software Engineering Lead at LMX Labs. Full stack developer specialising in React, TypeScript, Python and AI-driven systems. B.Tech Computer Engineering at VIT Vellore with a Major in Artificial Intelligence from IIT Ropar.",
-          "nationality": { "@type": "Country", "name": "India" },
-          "address": {
-            "@type": "PostalAddress",
-            "addressLocality": "Vellore",
-            "addressRegion": "Tamil Nadu",
-            "addressCountry": "IN"
-          },
-          "worksFor": {
-            "@type": "Organization",
-            "name": "LMX Labs",
-            "description": "Product studio behind Saturdays and DineGuru"
-          },
-          "alumniOf": [
-            {
-              "@type": "CollegeOrUniversity",
-              "name": "Vellore Institute of Technology",
-              "alternateName": "VIT Vellore",
-              "sameAs": "https://vit.ac.in/"
-            },
-            {
-              "@type": "CollegeOrUniversity",
-              "name": "Indian Institute of Technology, Ropar",
-              "alternateName": "IIT Ropar",
-              "sameAs": "https://www.iitrpr.ac.in/"
-            }
-          ],
-          "knowsAbout": [
-            "Full Stack Development", "React", "TypeScript", "JavaScript", "Next.js",
-            "Python", "FastAPI", "Node.js", "Machine Learning", "Deep Learning",
-            "PyTorch", "TensorFlow", "Recommender Systems", "Retrieval Augmented Generation",
-            "AI Governance", "PostgreSQL", "Docker", "Tailwind CSS", "Software Architecture"
-          ],
-          "knowsLanguage": ["English", "Hindi"],
-          "sameAs": [
-            "https://github.com/Divyakush2006",
-            "https://linkedin.com/in/divyakush-punjabi"
-          ]
+          "@type": "CollegeOrUniversity",
+          "name": "Vellore Institute of Technology",
+          "alternateName": "VIT Vellore",
+          "sameAs": "https://vit.ac.in/"
         },
         {
-          "@type": "WebSite",
-          "@id": "https://www.divyakush.com/#website",
-          "url": "https://www.divyakush.com/",
-          "name": "Divyakush Punjabi — Portfolio",
-          "description": "Portfolio and professional resume of Divyakush Punjabi, Software Engineering Lead and full stack developer.",
-          "inLanguage": "en",
-          "publisher": { "@id": "https://www.divyakush.com/#person" },
-          "about": { "@id": "https://www.divyakush.com/#person" }
-        },
-        {
-          "@type": "ProfilePage",
-          "@id": "https://www.divyakush.com/#profilepage",
-          "url": "https://www.divyakush.com/",
-          "name": "Divyakush Punjabi | Full Stack Developer & AI Enthusiast",
-          "isPartOf": { "@id": "https://www.divyakush.com/#website" },
-          "about": { "@id": "https://www.divyakush.com/#person" },
-          "mainEntity": { "@id": "https://www.divyakush.com/#person" },
-          "primaryImageOfPage": { "@type": "ImageObject", "url": "https://www.divyakush.com/og-image.png" }
-        },
-        {
-          "@type": "SoftwareSourceCode",
-          "@id": "https://www.divyakush.com/#saturdays",
-          "name": "Saturdays",
-          "description": "Consumer food-delivery marketplace with Stripe and PhonePe payments, built and led end to end by Divyakush Punjabi.",
-          "url": "https://saturdays.co.in",
-          "author": { "@id": "https://www.divyakush.com/#person" },
-          "creator": { "@id": "https://www.divyakush.com/#person" },
-          "programmingLanguage": ["TypeScript", "React", "Node.js"],
-          "keywords": "food delivery platform, Stripe payments, PhonePe, React marketplace, Divyakush Punjabi"
-        },
-        {
-          "@type": "SoftwareSourceCode",
-          "@id": "https://www.divyakush.com/#dineguru",
-          "name": "DineGuru",
-          "description": "Multi-tenant restaurant operations platform built on FastAPI and PostgreSQL by Divyakush Punjabi.",
-          "url": "https://dineguru.in",
-          "author": { "@id": "https://www.divyakush.com/#person" },
-          "creator": { "@id": "https://www.divyakush.com/#person" },
-          "programmingLanguage": ["Python", "FastAPI", "PostgreSQL"],
-          "keywords": "multi-tenant restaurant POS, FastAPI, PostgreSQL, Divyakush Punjabi"
-        },
-        {
-          "@type": "SoftwareSourceCode",
-          "@id": "https://www.divyakush.com/#research-atlas",
-          "name": "GovernAI Research Atlas",
-          "description": "Open-source semantic discovery platform for AI-governance research, built by Divyakush Punjabi at GovernAI.",
-          "url": "https://github.com/divyakush2006/GAI-Research-Atlas",
-          "codeRepository": "https://github.com/divyakush2006/GAI-Research-Atlas",
-          "author": { "@id": "https://www.divyakush.com/#person" },
-          "creator": { "@id": "https://www.divyakush.com/#person" },
-          "programmingLanguage": ["Python", "React"],
-          "keywords": "AI governance, semantic search, research discovery, GovernAI, Divyakush Punjabi"
-        },
-        {
-          "@type": "SoftwareSourceCode",
-          "@id": "https://www.divyakush.com/#rockfall",
-          "name": "AI Rockfall Detection and Prevention",
-          "description": "Smart India Hackathon 2025 shortlisted system for rockfall prediction using machine learning, by Divyakush Punjabi.",
-          "url": "https://github.com/Divyakush2006/AI-ROCKFALL-DETECTION-AND-PREVENTION",
-          "codeRepository": "https://github.com/Divyakush2006/AI-ROCKFALL-DETECTION-AND-PREVENTION",
-          "author": { "@id": "https://www.divyakush.com/#person" },
-          "creator": { "@id": "https://www.divyakush.com/#person" },
-          "programmingLanguage": ["Python"],
-          "keywords": "rockfall prediction, machine learning, Smart India Hackathon 2025, Divyakush Punjabi"
-        },
-        {
-          "@type": "SoftwareSourceCode",
-          "@id": "https://www.divyakush.com/#netra",
-          "name": "Netra",
-          "description": "Edge-AI surveillance system with ESP32-CAM and YOLOv8, built by Divyakush Punjabi.",
-          "url": "https://github.com/divyakush2006/Netra",
-          "codeRepository": "https://github.com/divyakush2006/Netra",
-          "author": { "@id": "https://www.divyakush.com/#person" },
-          "creator": { "@id": "https://www.divyakush.com/#person" },
-          "programmingLanguage": ["Python", "C++"],
-          "keywords": "ESP32-CAM, YOLOv8, edge AI surveillance, Divyakush Punjabi"
-        },
-        {
-          "@type": "SoftwareSourceCode",
-          "@id": "https://www.divyakush.com/#algoverse",
-          "name": "AlgoVerse",
-          "description": "Interactive data-structures and algorithms visualisation platform, built by Divyakush Punjabi.",
-          "url": "https://github.com/divyakush2006/AlgoVerse",
-          "codeRepository": "https://github.com/divyakush2006/AlgoVerse",
-          "author": { "@id": "https://www.divyakush.com/#person" },
-          "creator": { "@id": "https://www.divyakush.com/#person" },
-          "programmingLanguage": ["TypeScript", "React"],
-          "keywords": "DSA visualization, algorithms, data structures, Divyakush Punjabi"
+          "@type": "CollegeOrUniversity",
+          "name": "Indian Institute of Technology, Ropar",
+          "alternateName": "IIT Ropar",
+          "sameAs": "https://www.iitrpr.ac.in/"
         }
+      ],
+      "knowsAbout": [
+        "Full Stack Development",
+        "React",
+        "TypeScript",
+        "JavaScript",
+        "Next.js",
+        "Python",
+        "FastAPI",
+        "Node.js",
+        "Machine Learning",
+        "Deep Learning",
+        "PyTorch",
+        "TensorFlow",
+        "Recommender Systems",
+        "Retrieval Augmented Generation",
+        "AI Governance",
+        "PostgreSQL",
+        "Docker",
+        "Tailwind CSS",
+        "Software Architecture"
+      ],
+      "knowsLanguage": [
+        "English",
+        "Hindi"
+      ],
+      "sameAs": [
+        "https://github.com/Divyakush2006",
+        "https://linkedin.com/in/divyakush-punjabi"
+      ],
+      "alternateName": "Divyakush",
+      "mainEntityOfPage": {
+        "@id": "https://www.divyakush.com/#profilepage"
+      },
+      "affiliation": [
+        {
+          "@id": "https://www.divyakush.com/#governai"
+        },
+        {
+          "@id": "https://www.divyakush.com/#vubs"
+        }
+      ],
+      "hasOccupation": {
+        "@type": "Occupation",
+        "name": "Full-Stack Software Engineer",
+        "occupationalCategory": "15-1252.00 Software Developers",
+        "skills": "React, TypeScript, Next.js, Python, FastAPI, Node.js, Machine Learning, Deep Learning, PyTorch, System Design"
+      },
+      "award": [
+        "Smart India Hackathon 2025 — Shortlisted (AI Rockfall Detection & Prevention)",
+        "E-Cell IIT Bombay National Entrepreneurship Challenge — All India Rank 140"
       ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.divyakush.com/#website",
+      "url": "https://www.divyakush.com/",
+      "name": "Divyakush Punjabi — Portfolio",
+      "description": "Portfolio and professional resume of Divyakush Punjabi, Software Engineering Lead and full stack developer.",
+      "inLanguage": "en",
+      "publisher": {
+        "@id": "https://www.divyakush.com/#person"
+      },
+      "about": {
+        "@id": "https://www.divyakush.com/#person"
+      }
+    },
+    {
+      "@type": "ProfilePage",
+      "@id": "https://www.divyakush.com/#profilepage",
+      "url": "https://www.divyakush.com/",
+      "name": "Divyakush Punjabi | Full Stack Developer & AI Enthusiast",
+      "isPartOf": {
+        "@id": "https://www.divyakush.com/#website"
+      },
+      "about": {
+        "@id": "https://www.divyakush.com/#person"
+      },
+      "mainEntity": {
+        "@id": "https://www.divyakush.com/#person"
+      },
+      "primaryImageOfPage": {
+        "@type": "ImageObject",
+        "url": "https://www.divyakush.com/og-image.png"
+      }
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "@id": "https://www.divyakush.com/#saturdays",
+      "name": "Saturdays",
+      "description": "Consumer food-delivery marketplace with Stripe and PhonePe payments, built and led end to end by Divyakush Punjabi.",
+      "url": "https://saturdays.co.in",
+      "author": {
+        "@id": "https://www.divyakush.com/#person"
+      },
+      "creator": {
+        "@id": "https://www.divyakush.com/#person"
+      },
+      "programmingLanguage": [
+        "TypeScript",
+        "React",
+        "Node.js"
+      ],
+      "keywords": "food delivery platform, Stripe payments, PhonePe, React marketplace, Divyakush Punjabi"
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "@id": "https://www.divyakush.com/#dineguru",
+      "name": "DineGuru",
+      "description": "Multi-tenant restaurant operations platform built on FastAPI and PostgreSQL by Divyakush Punjabi.",
+      "url": "https://dineguru.in",
+      "author": {
+        "@id": "https://www.divyakush.com/#person"
+      },
+      "creator": {
+        "@id": "https://www.divyakush.com/#person"
+      },
+      "programmingLanguage": [
+        "Python",
+        "FastAPI",
+        "PostgreSQL"
+      ],
+      "keywords": "multi-tenant restaurant POS, FastAPI, PostgreSQL, Divyakush Punjabi"
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "@id": "https://www.divyakush.com/#research-atlas",
+      "name": "GovernAI Research Atlas",
+      "description": "Open-source semantic discovery platform for AI-governance research, built by Divyakush Punjabi at GovernAI.",
+      "url": "https://github.com/divyakush2006/GAI-Research-Atlas",
+      "codeRepository": "https://github.com/divyakush2006/GAI-Research-Atlas",
+      "author": {
+        "@id": "https://www.divyakush.com/#person"
+      },
+      "creator": {
+        "@id": "https://www.divyakush.com/#person"
+      },
+      "programmingLanguage": [
+        "Python",
+        "React"
+      ],
+      "keywords": "AI governance, semantic search, research discovery, GovernAI, Divyakush Punjabi",
+      "sourceOrganization": {
+        "@id": "https://www.divyakush.com/#governai"
+      }
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "@id": "https://www.divyakush.com/#rockfall",
+      "name": "AI Rockfall Detection and Prevention",
+      "description": "Smart India Hackathon 2025 shortlisted system for rockfall prediction using machine learning, by Divyakush Punjabi.",
+      "url": "https://github.com/Divyakush2006/AI-ROCKFALL-DETECTION-AND-PREVENTION",
+      "codeRepository": "https://github.com/Divyakush2006/AI-ROCKFALL-DETECTION-AND-PREVENTION",
+      "author": {
+        "@id": "https://www.divyakush.com/#person"
+      },
+      "creator": {
+        "@id": "https://www.divyakush.com/#person"
+      },
+      "programmingLanguage": [
+        "Python"
+      ],
+      "keywords": "rockfall prediction, machine learning, Smart India Hackathon 2025, Divyakush Punjabi"
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "@id": "https://www.divyakush.com/#netra",
+      "name": "Netra",
+      "description": "Edge-AI surveillance system with ESP32-CAM and YOLOv8, built by Divyakush Punjabi.",
+      "url": "https://github.com/divyakush2006/Netra",
+      "codeRepository": "https://github.com/divyakush2006/Netra",
+      "author": {
+        "@id": "https://www.divyakush.com/#person"
+      },
+      "creator": {
+        "@id": "https://www.divyakush.com/#person"
+      },
+      "programmingLanguage": [
+        "Python",
+        "C++"
+      ],
+      "keywords": "ESP32-CAM, YOLOv8, edge AI surveillance, Divyakush Punjabi"
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "@id": "https://www.divyakush.com/#algoverse",
+      "name": "AlgoVerse",
+      "description": "Interactive data-structures and algorithms visualisation platform, built by Divyakush Punjabi.",
+      "url": "https://github.com/divyakush2006/AlgoVerse",
+      "codeRepository": "https://github.com/divyakush2006/AlgoVerse",
+      "author": {
+        "@id": "https://www.divyakush.com/#person"
+      },
+      "creator": {
+        "@id": "https://www.divyakush.com/#person"
+      },
+      "programmingLanguage": [
+        "TypeScript",
+        "React"
+      ],
+      "keywords": "DSA visualization, algorithms, data structures, Divyakush Punjabi"
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://www.divyakush.com/#lmxlabs",
+      "name": "LMX Labs",
+      "description": "Product studio behind Saturdays and DineGuru.",
+      "employee": {
+        "@id": "https://www.divyakush.com/#person"
+      }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://www.divyakush.com/#governai",
+      "name": "GovernAI",
+      "url": "https://www.governai.info",
+      "sameAs": "https://www.governai.info",
+      "description": "AI-governance research organisation.",
+      "member": {
+        "@id": "https://www.divyakush.com/#person"
+      }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://www.divyakush.com/#vubs",
+      "name": "VUBS Corporation",
+      "description": "BASF authorised channel partner.",
+      "member": {
+        "@id": "https://www.divyakush.com/#person"
+      }
     }
+  ]
+}
     </script>
     <script type="module" crossorigin src="/assets/index-C7B0BE8l.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-CjDfV3DZ.css">
