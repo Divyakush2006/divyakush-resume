@@ -1,14 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Sitemap for https://www.divyakush.com — Divyakush Punjabi, Portfolio -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://www.divyakush.com/</loc>
-    <lastmod>2026-07-28</lastmod>
+    <lastmod>2026-07-29</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.divyakush.com/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.divyakush.com/"/>
     <image:image>
       <image:loc>https://www.divyakush.com/og-image.png</image:loc>
       <image:title>Divyakush Punjabi — Software Engineering Lead</image:title>
+      <image:caption>Portfolio of Divyakush Punjabi, Software Engineering Lead and full-stack developer specialising in React, TypeScript, Python and AI.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.divyakush.com/profile.jpg</image:loc>
+      <image:title>Divyakush Punjabi</image:title>
     </image:image>
   </url>
 </urlset>
