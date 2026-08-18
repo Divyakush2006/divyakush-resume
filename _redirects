@@ -1,0 +1,6 @@
+# Cloudflare Pages config.
+# SPA fallback: client-side routes (e.g. /projects/:slug) serve the app shell so
+# they resolve instead of 404. Real files (sitemap.xml, og-image.png, robots.txt,
+# the IndexNow key, assets/*, google*.html) are served first; only unmatched
+# paths fall through to index.html.
+/*    /index.html    200
