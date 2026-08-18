@@ -1,0 +1,11 @@
+{
+  // Cloudflare config: serve this repo as a static site (no Worker script).
+  // Static-asset requests are free and unlimited, including on the Free plan.
+  "name": "dk-portfolio",
+  "compatibility_date": "2025-06-01",
+  "assets": {
+    "directory": ".",
+    // client-side routes like /projects/:slug fall back to the app shell
+    "not_found_handling": "single-page-application"
+  }
+}
