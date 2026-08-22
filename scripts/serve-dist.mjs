@@ -14,6 +14,13 @@
         ran against a site with no Content-Security-Policy, no caching
         rules and no security headers — which is to say, not against the
         site being shipped. The CSP audit exists because of that gap.
+     4. public/_redirects is parsed and applied, before the file lookup,
+        because that is Cloudflare's documented order — a redirect is
+        "always followed, regardless of whether or not an asset matches
+        the incoming request". Without this a rule looks fine locally
+        (nothing matches, the 404 still works) and behaves differently
+        in production, which is the failure mode this whole file exists
+        to prevent.
 
    `next dev` and `next start` are both wrong for this: the first runs a
    development bundle, and the second needs a server this site does not
@@ -86,6 +93,51 @@ const matches = (pattern, url) => {
 
 const RULES = loadHeaderRules(DIST);
 
+/* ── _redirects ──────────────────────────────────────────
+   `<source> <destination> [status]`, one per line, `#` comments.
+   Status defaults to 302 when omitted, which is Cloudflare's default
+   and not an assumption worth inheriting silently — every rule this
+   site ships names its status.
+
+   Only the exact-match and single-splat forms are implemented, because
+   they are the only forms in public/_redirects. A rule using a
+   placeholder like /:id would parse here and not work, so it would be
+   better to fail loudly — but adding a parser for syntax nothing uses
+   is how a mimic drifts from the thing it mimics. If a placeholder
+   rule is ever added, this needs to grow with it. */
+function loadRedirectRules(dir) {
+  const file = path.join(dir, '_redirects');
+  if (!fs.existsSync(file)) return [];
+
+  const rules = [];
+  for (const raw of fs.readFileSync(file, 'utf8').split('\n')) {
+    const line = raw.replace(/\r$/, '').trim();
+    if (!line || line.startsWith('#')) continue;
+
+    const [from, to, status] = line.split(/\s+/);
+    if (!from || !to) continue;
+    rules.push({ from, to, status: Number(status) || 302 });
+  }
+  return rules;
+}
+
+const REDIRECTS = loadRedirectRules(DIST);
+
+/** The first matching rule wins, as on Pages. */
+function redirectFor(url) {
+  for (const r of REDIRECTS) {
+    if (r.from === url) return r;
+    if (r.from.endsWith('/*')) {
+      const base = r.from.slice(0, -2);
+      if (url === base || url.startsWith(base + '/')) {
+        return { ...r, to: r.to.replace(':splat', url.slice(base.length + 1)) };
+      }
+    }
+  }
+  return null;
+}
+
+
 function headersFor(url) {
   const out = {};
   for (const rule of RULES) {
@@ -98,6 +150,15 @@ function headersFor(url) {
 http
   .createServer((req, res) => {
     const url = decodeURIComponent(req.url.split('?')[0]);
+
+    /* Before the file lookup, not after: Cloudflare follows a matching
+       redirect even when a file would have answered. */
+    const redirect = redirectFor(url);
+    if (redirect) {
+      res.writeHead(redirect.status, { location: redirect.to, ...headersFor(url) });
+      return res.end();
+    }
+
     const candidates = [
       path.join(DIST, url),
       path.join(DIST, url, 'index.html'),
@@ -121,5 +182,8 @@ http
     res.end(fs.readFileSync(path.join(DIST, '404.html')));
   })
   .listen(PORT, () =>
-    console.log(`cf-mimic on ${PORT}  serving ${DIST}  (${RULES.length} header rules)`),
+    console.log(
+      `cf-mimic on ${PORT}  serving ${DIST}  ` +
+        `(${RULES.length} header rules, ${REDIRECTS.length} redirects)`,
+    ),
   );

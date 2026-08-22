@@ -31,3 +31,24 @@
 #
 # scripts/serve-dist.mjs reproduces both behaviours locally, and
 # scripts/audit-site.mjs fails if either stops holding.
+#
+# ── The one path rule ─────────────────────────────────────────
+#
+# /projects was a 404. It is the URL a person types when they want the
+# work, and the one an outside link guesses at, so it should answer.
+#
+# It resolves to the work section of the home page rather than to a new
+# index page, because that section already IS the projects index — all
+# ten of them, with covers, in the deck. A second page listing the same
+# ten would be a duplicate of a section that already ranks.
+#
+# 301 and not 302: this is permanent. The consequence is that Google
+# folds /projects into / and never indexes it separately, which is the
+# correct outcome — it is an alias, not a page. It is deliberately NOT
+# in sitemap.xml for the same reason: a sitemap lists canonical
+# destinations, and submitting a redirect is a Search Console error.
+#
+# The fragment survives the hop. A browser applies it after following
+# the Location header, so the visitor lands on the work section.
+
+/projects  /#work  301
