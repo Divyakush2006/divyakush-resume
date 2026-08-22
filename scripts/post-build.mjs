@@ -48,31 +48,60 @@ const fail = (msg) => problems.push(msg);
    can read a log for, so the export gets a copy at the name that is
    actually requested.
 
-   This is a shim against one framework version, so it fails loudly
-   rather than silently: if the nested layout ever stops appearing,
-   the assertion below says so instead of quietly doing nothing. */
-function flattenSegmentPayloads(dir) {
-  let written = 0;
+   ── The layout is not the same on every platform ──────────────
+   The nested form above is what the export writes on Windows. On the
+   Linux image Cloudflare Pages builds in, the same version of Next
+   writes the flat name directly — the file is already at the URL the
+   client asks for, and there is nothing to copy.
 
-  const walk = (current) => {
+   The first version of this check asserted "at least one file was
+   copied", which is a statement about the *mechanism*. It failed the
+   very first Cloudflare build with `0 segment payloads copied`,
+   correctly reporting that nothing had been flattened and wrongly
+   concluding something was broken. Nothing was: that platform had
+   already put every payload where it belonged.
+
+   So what is asserted now is the *outcome* — that payloads exist at
+   the names the client requests — which is the thing that actually
+   has to be true, and is true on both layouts. The flattening still
+   runs where there is something to flatten.
+
+   Measured, by running this build in the same node:22-bookworm image
+   Cloudflare uses rather than guessing at it:
+
+     platform   nested dirs   copied   payloads fetchable
+     Windows             23       23                   72
+     Linux                0        0                   72
+
+   Same seventy-two files, reached two different ways. Which is the
+   whole point: the number that matters is the last column, and it was
+   never the one being checked. */
+function reconcileSegmentPayloads(dir) {
+  let copied = 0;
+  let nested = 0;
+
+  /* Pass one: where the payloads are nested, write a copy at the
+     dot-joined name. */
+  const flatten = (current) => {
     for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
       const full = path.join(current, entry.name);
       if (!entry.isDirectory()) continue;
       if (entry.name === '_next') continue;
 
       if (entry.name.startsWith('__next.')) {
+        nested++;
         /* Everything under here is one payload per file, and the
            flattened name is the path to it with dots for slashes. */
-        const collect = (nested, parts) => {
-          for (const e of fs.readdirSync(nested, { withFileTypes: true })) {
-            const p = path.join(nested, e.name);
+        const collect = (dirPath, parts) => {
+          for (const e of fs.readdirSync(dirPath, { withFileTypes: true })) {
+            const p = path.join(dirPath, e.name);
             if (e.isDirectory()) collect(p, [...parts, e.name]);
             else if (e.name.endsWith('.txt')) {
               const flat = [entry.name, ...parts, e.name].join('.');
               const target = path.join(current, flat);
               if (!fs.existsSync(target)) {
                 fs.copyFileSync(p, target);
-                written++;
+                copied++;
               }
             }
           }
@@ -81,17 +110,48 @@ function flattenSegmentPayloads(dir) {
         continue;
       }
 
-      walk(full);
+      flatten(full);
     }
   };
 
-  walk(dir);
-  return written;
+  /* Pass two: count what a client would actually be able to fetch,
+     however it got there. */
+  const found = [];
+  const count = (current) => {
+    for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
+      const full = path.join(current, entry.name);
+      if (entry.isDirectory()) {
+        if (entry.name !== '_next') count(full);
+        continue;
+      }
+      if (entry.name.startsWith('__next') && entry.name.endsWith('.txt')) {
+        found.push(full.slice(dir.length).replace(/\\/g, '/'));
+      }
+    }
+  };
+
+  flatten(dir);
+  count(dir);
+  return { copied, nested, found };
 }
 
-const flattened = flattenSegmentPayloads(OUT);
-if (flattened === 0) {
-  fail('no segment payloads were flattened — has the export layout changed?');
+const segments = reconcileSegmentPayloads(OUT);
+if (segments.found.length === 0) {
+  fail('no RSC segment payloads in the export at all — prefetches will 404');
+  /* Print what is actually there, so the next person does not have to
+     guess at a layout they cannot reproduce on their own machine. */
+  const stray = [];
+  const look = (d) => {
+    for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+      const p = path.join(d, e.name);
+      if (e.isDirectory()) {
+        if (e.name !== '_next') look(p);
+      } else if (e.name.endsWith('.txt')) stray.push(p.slice(OUT.length));
+    }
+  };
+  look(OUT);
+  console.log(`\n  .txt files found in the export (${stray.length}):`);
+  for (const s of stray.slice(0, 25)) console.log('    ' + s.replace(/\\/g, '/'));
 }
 
 /* ── The documents ────────────────────────────────────────────── */
@@ -247,7 +307,10 @@ const walk = (dir) => {
 walk(chunks);
 
 console.log(`  documents      ${routes.length} routes, ${heroPreloads} carrying a hero preload`);
-console.log(`  prefetch       ${flattened} segment payloads copied to their requested names`);
+console.log(
+  `  prefetch       ${segments.found.length} segment payloads fetchable` +
+    ` (${segments.nested} nested dirs, ${segments.copied} copied to flat names)`,
+);
 console.log(`  sitemap.xml    ${(bytes(path.join(OUT, 'sitemap.xml')) / 1024).toFixed(1)} KB`);
 console.log(`  llms.txt       ${(bytes(path.join(OUT, 'llms.txt')) / 1024).toFixed(1)} KB`);
 console.log(`  home document  ${(bytes(path.join(OUT, 'index.html')) / 1024).toFixed(1)} KB`);
