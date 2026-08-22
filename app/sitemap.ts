@@ -74,6 +74,10 @@ const SOURCE = {
   projects: RECORDED.projects ?? BUILD_DATE,
   insights: RECORDED.insights ?? BUILD_DATE,
   certifications: RECORDED.certifications ?? BUILD_DATE,
+  /* The roles are data too, even though they live in the component
+     that renders them. The home page shows them, so editing one
+     changes the home page. */
+  experience: RECORDED.experience ?? BUILD_DATE,
 } as const;
 
 /* The home page renders all of it, so it is as new as the newest

@@ -41,6 +41,7 @@ const SOURCES = {
   projects: 'src/lib/projects.ts',
   insights: 'src/lib/insights.ts',
   certifications: 'src/lib/certifications.ts',
+  experience: 'src/components/ExperienceRoles.tsx',
 };
 
 /* Seeding a key for the first time, git is still the best answer
@@ -60,6 +61,18 @@ function firstSeen(file) {
       }).trim(),
     );
     if (!Number.isFinite(commits) || commits < 2) return null;
+
+    /* A file with uncommitted edits has changed since its last
+       commit by definition, so that commit's date is the one thing
+       the answer cannot be. Seeding a new key while the file is dirty
+       would date a change that has not been made yet. */
+    const dirty =
+      execFileSync('git', ['status', '--porcelain', '--', file], {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'ignore'],
+        cwd: ROOT,
+      }).trim() !== '';
+    if (dirty) return null;
 
     const out = execFileSync('git', ['log', '-1', '--format=%cI', '--', file], {
       encoding: 'utf8',
