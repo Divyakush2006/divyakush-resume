@@ -1,0 +1,13 @@
+/* TEAM */
+    Name:     Divyakush Punjabi
+    Role:     Full Stack & AI Systems Engineer
+    Site:     https://www.divyakush.com
+    GitHub:   https://github.com/Divyakush2006
+    LinkedIn: https://linkedin.com/in/divyakush-punjabi
+    Location: Vellore, Tamil Nadu, India
+
+/* SITE */
+    Last updated: 2026-08-22
+    Standards:    HTML5, CSS3, JSON-LD, WAI-ARIA
+    Components:   React, TypeScript, Next.js, Tailwind CSS, motion
+    Hosting:      Cloudflare Pages

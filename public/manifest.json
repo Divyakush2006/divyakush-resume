@@ -1,0 +1,17 @@
+{
+  "name": "Divyakush Punjabi — Full Stack & AI Systems Engineer",
+  "short_name": "Divyakush Punjabi",
+  "description": "Full stack and AI systems engineer — multi-tenant SaaS, semantic retrieval, production ML. Engineering lead at LMX Labs. VIT Vellore, AI major at IIT Ropar.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0B0B0C",
+  "theme_color": "#0B0B0C",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

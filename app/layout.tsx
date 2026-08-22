@@ -113,6 +113,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {SAME_AS.map((url) => (
           <link key={url} rel="me" href={url} />
         ))}
+
+        {/* public/manifest.json. It carried over from the site this one
+            replaces, and it is linked because an unlinked manifest is a
+            file nothing reads: the name, colours and display mode only
+            reach the browser through this relation. Its `theme_color`
+            is the same #0B0B0C as the `viewport` export above — two
+            places that must agree, or the address bar and the
+            installed splash screen disagree with each other. */}
+        <link rel="manifest" href="/manifest.json" />
       </head>
 
       <body className="bg-ink text-bone-raised font-sans antialiased">

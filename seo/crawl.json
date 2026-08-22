@@ -1,6 +1,6 @@
 {
   "base": "http://localhost:5188",
-  "when": "2026-08-22T00:22:12.230Z",
+  "when": "2026-08-22T00:40:08.574Z",
   "missingStatus": 404,
   "rows": [
     {
@@ -15,7 +15,7 @@
         "titleCount": 1,
         "canonicalCount": 1,
         "jsonld": [
-          "{\"@context\":\"https://schema.org\",\"@graph\":[{\"@type\":\"Person\",\"@id\":\"https://www.divyakush.com/#person\",\"name\":\"Divyakush Punjabi\",\"url\":\"https://www.divyakush.com/\",\"jobTitle\":\"Full Stack & AI Systems Engineer\",\"alumniOf\":[{\"@type\":\"CollegeOrUniversity\",\"name\":\"Vellore Institute of Technology\"},{\"@type\":\"CollegeOrUniversity\",\"name\":\"Indian Institute of Technology Ropar\"}],\"worksFor\":{\"@type\":\"Organization\",\"name\":\"LMX Labs\"},\"knowsAbout\":[\"Full stack engineering\",\"Machine learning\",\"Retrieval-augmented generation\",\"Multi-tenant SaaS architecture\",\"PostgreSQL\",\"React\",\"TypeScript\",\"Python\",\"FastAPI\",\"Django\",\"Verilog HDL\",\"Embedded systems\",\"Computer vision\"],\"image\":{\"@id\":\"https://www.divyakush.com/#logo\"},\"sameAs\":[\"https://github.com/Divyakush2006\",\"https://www.linkedin.com/in/divyakush-punjabi\",\"https://dev.to/divyakush\",\"https://about.me/divyakush\",\"https://divyakush.is-a.dev\",\"https://divyakush2006.github.io/divyakush-resume/\"]},{\"@type\":\"ImageObject\",\"@id\":\"https://www.divyakush.com/#logo\",\"url\":\"https://www.divyakush.com/og-image.png\",\"contentUrl\":\"https://www.divyakush.com/og-image.png\",\"width\":1200,\"height\":630,\"caption\":\"Divyakush Punjabi\"},{\"@type\":\"WebSite\",\"@id\":\"https://www.divyakush.com/#website\",\"url\":\"https://www.divyakush.com/\",\"name\":\"Divyakush Punjabi\",\"publisher\":{\"@id\":\"https://www.divyakush.com/#person\"},\"inLanguage\":\"en\"},{\"@type\":\"ProfilePage\",\"@id\":\"https://www.divyakush.com/#webpage\",\"url\":\"https://www.divyakush.com/\",\"name\":\"Divyakush Punjabi — Full Stack & AI Systems Engineer\",\"description\":\"Portfolio and record of work.\",\"isPartOf\":{\"@id\":\"https://www.divyakush.com/#website\"},\"about\":{\"@id\":\"https://www.divyakush.com/#person\"},\"inLanguage\":\"en\",\"mainEntity\":{\"@id\":\"https://www.divyakush.com/#person\"},\"primaryImageOfPage\":{\"@id\":\"https://www.divyakush.com/#logo\"}}]}"
+          "{\"@context\":\"https://schema.org\",\"@graph\":[{\"@type\":\"Person\",\"@id\":\"https://www.divyakush.com/#person\",\"name\":\"Divyakush Punjabi\",\"url\":\"https://www.divyakush.com/\",\"jobTitle\":\"Full Stack & AI Systems Engineer\",\"alumniOf\":[{\"@type\":\"CollegeOrUniversity\",\"name\":\"Vellore Institute of Technology\"},{\"@type\":\"CollegeOrUniversity\",\"name\":\"Indian Institute of Technology Ropar\"}],\"worksFor\":{\"@type\":\"Organization\",\"name\":\"LMX Labs\"},\"knowsAbout\":[\"Full stack engineering\",\"Machine learning\",\"Retrieval-augmented generation\",\"Multi-tenant SaaS architecture\",\"PostgreSQL\",\"React\",\"TypeScript\",\"Python\",\"FastAPI\",\"Django\",\"Verilog HDL\",\"Embedded systems\",\"Computer vision\"],\"image\":{\"@id\":\"https://www.divyakush.com/#logo\"},\"sameAs\":[\"https://github.com/Divyakush2006\",\"https://www.linkedin.com/in/divyakush-punjabi\",\"https://dev.to/divyakush\",\"https://about.me/divyakush\",\"https://divyakush.is-a.dev\",\"https://divyakush2006.github.io/divyakush-resume/\"],\"description\":\"Divyakush Punjabi is a full stack and AI systems engineer. He leads engineering at LMX Labs across two live platforms, reads a B.Tech in Computer Engineering at Vellore Institute of Technology, and holds a Major Degree in Artificial Intelligence from IIT Ropar.\",\"hasCredential\":[{\"@type\":\"EducationalOccupationalCredential\",\"name\":\"Major Certification in Artificial Intelligence\",\"credentialCategory\":\"AI & ML\",\"recognizedBy\":{\"@type\":\"Organization\",\"name\":\"IIT Ropar, with NSDC and Masai\"},\"dateCreated\":\"2026-06\",\"identifier\":\"IITRPRAI-CC6722\"},{\"@type\":\"EducationalOccupationalCredential\",\"name\":\"Build Your Generative AI Productivity Skills\",\"credentialCategory\":\"AI & ML\",\"recognizedBy\":{\"@type\":\"Organization\",\"name\":\"LinkedIn Learning with Microsoft\"},\"dateCreated\":\"2024-10\",\"identifier\":\"e0a3e83c8fd519dd90de5246d898a3ecce542e93f735c95a85bb1748ac2e8a7d\"},{\"@type\":\"EducationalOccupationalCredential\",\"name\":\"Web Developer Internship\",\"credentialCategory\":\"Web & Product\",\"recognizedBy\":{\"@type\":\"Organization\",\"name\":\"GovernAI (OPC) Private Limited\"},\"dateCreated\":\"2026-06-30\",\"identifier\":\"011413\"},{\"@type\":\"EducationalOccupationalCredential\",\"name\":\"Corporate Website, End to End\",\"credentialCategory\":\"Web & Product\",\"recognizedBy\":{\"@type\":\"Organization\",\"name\":\"VUBS Corporation\"},\"dateCreated\":\"2026\"},{\"@type\":\"EducationalOccupationalCredential\",\"name\":\"UI/UX Design Internship\",\"credentialCategory\":\"Design\",\"recognizedBy\":{\"@type\":\"Organization\",\"name\":\"LayOver\"},\"dateCreated\":\"2025-07-20\"},{\"@type\":\"EducationalOccupationalCredential\",\"name\":\"National Entrepreneurship Challenge 2024\",\"credentialCategory\":\"Competitions\",\"recognizedBy\":{\"@type\":\"Organization\",\"name\":\"E-Cell, IIT Bombay\"},\"dateCreated\":\"2024\"},{\"@type\":\"EducationalOccupationalCredential\",\"name\":\"Career Essentials in Software Development\",\"credentialCategory\":\"Engineering\",\"recognizedBy\":{\"@type\":\"Organization\",\"name\":\"LinkedIn Learning with Microsoft\"},\"dateCreated\":\"2024-10\",\"identifier\":\"ae0605a471993430aec505ca8d8efe155360e8bf5465306d04e742ab136ed314\"},{\"@type\":\"EducationalOccupationalCredential\",\"name\":\"Programming Foundations: Beyond the Fundamentals\",\"credentialCategory\":\"Engineering\",\"recognizedBy\":{\"@type\":\"Organization\",\"name\":\"LinkedIn Learning\"},\"dateCreated\":\"2024-10\",\"identifier\":\"47f21dc24c348ede1d637e582e93ee57b175b03faf5d9036b656ecc66e8b9075\"},{\"@type\":\"EducationalOccupationalCredential\",\"name\":\"Advanced Drone Technology (Air Taxi) Workshop\",\"credentialCategory\":\"Engineering\",\"recognizedBy\":{\"@type\":\"Organization\",\"name\":\"Bharat Space Education Research Centre with IISc Bengaluru\"},\"dateCreated\":\"2025-07-13\"},{\"@type\":\"EducationalOccupationalCredential\",\"name\":\"Prod Wars 3.0 — Product Management Case Competition\",\"credentialCategory\":\"Web & Product\",\"recognizedBy\":{\"@type\":\"Organization\",\"name\":\"SJMSOM, IIT Bombay\"},\"dateCreated\":\"2025\"},{\"@type\":\"EducationalOccupationalCredential\",\"name\":\"EnCode 2026: Code To Innovate\",\"credentialCategory\":\"Competitions\",\"recognizedBy\":{\"@type\":\"Organization\",\"name\":\"IIT Guwahati\"},\"dateCreated\":\"2026\"},{\"@type\":\"EducationalOccupationalCredential\",\"name\":\"EY Techathon — Round 2\",\"credentialCategory\":\"Competitions\",\"recognizedBy\":{\"@type\":\"Organization\",\"name\":\"EY\"},\"dateCreated\":\"2025\"}]},{\"@type\":\"ImageObject\",\"@id\":\"https://www.divyakush.com/#logo\",\"url\":\"https://www.divyakush.com/og-image.png\",\"contentUrl\":\"https://www.divyakush.com/og-image.png\",\"width\":1200,\"height\":630,\"caption\":\"Divyakush Punjabi\"},{\"@type\":\"WebSite\",\"@id\":\"https://www.divyakush.com/#website\",\"url\":\"https://www.divyakush.com/\",\"name\":\"Divyakush Punjabi\",\"publisher\":{\"@id\":\"https://www.divyakush.com/#person\"},\"inLanguage\":\"en\"},{\"@type\":\"ProfilePage\",\"@id\":\"https://www.divyakush.com/#webpage\",\"url\":\"https://www.divyakush.com/\",\"name\":\"Divyakush Punjabi — Full Stack & AI Systems Engineer\",\"description\":\"Portfolio and record of work.\",\"isPartOf\":{\"@id\":\"https://www.divyakush.com/#website\"},\"about\":{\"@id\":\"https://www.divyakush.com/#person\"},\"inLanguage\":\"en\",\"mainEntity\":{\"@id\":\"https://www.divyakush.com/#person\"},\"primaryImageOfPage\":{\"@id\":\"https://www.divyakush.com/#logo\"}}]}"
         ],
         "noscriptWords": 75
       },
@@ -35,7 +35,7 @@
         "hasBreadcrumbNav": false
       },
       "vitals": {
-        "lcp": 2408,
+        "lcp": 2288,
         "cls": 0,
         "ttfb": 2
       },
@@ -147,7 +147,7 @@
         "hasBreadcrumbNav": true
       },
       "vitals": {
-        "lcp": 316,
+        "lcp": 332,
         "cls": 0,
         "ttfb": 2
       },
@@ -205,7 +205,7 @@
         "hasBreadcrumbNav": true
       },
       "vitals": {
-        "lcp": 316,
+        "lcp": 320,
         "cls": 0,
         "ttfb": 2
       },
@@ -379,7 +379,7 @@
         "hasBreadcrumbNav": true
       },
       "vitals": {
-        "lcp": 316,
+        "lcp": 324,
         "cls": 0,
         "ttfb": 2
       },
@@ -437,7 +437,7 @@
         "hasBreadcrumbNav": true
       },
       "vitals": {
-        "lcp": 320,
+        "lcp": 316,
         "cls": 0,
         "ttfb": 2
       },
@@ -495,9 +495,9 @@
         "hasBreadcrumbNav": true
       },
       "vitals": {
-        "lcp": 324,
+        "lcp": 316,
         "cls": 0,
-        "ttfb": 3
+        "ttfb": 2
       },
       "schema": {
         "blocks": 1,
@@ -555,7 +555,7 @@
       "vitals": {
         "lcp": 320,
         "cls": 0,
-        "ttfb": 2
+        "ttfb": 3
       },
       "schema": {
         "blocks": 1,
@@ -669,7 +669,7 @@
         "hasBreadcrumbNav": false
       },
       "vitals": {
-        "lcp": 2188,
+        "lcp": 2176,
         "cls": 0,
         "ttfb": 2
       },
@@ -727,7 +727,7 @@
         "hasBreadcrumbNav": false
       },
       "vitals": {
-        "lcp": 2156,
+        "lcp": 2172,
         "cls": 0,
         "ttfb": 2
       },
@@ -785,7 +785,7 @@
         "hasBreadcrumbNav": false
       },
       "vitals": {
-        "lcp": 2148,
+        "lcp": 2164,
         "cls": 0,
         "ttfb": 2
       },
@@ -843,7 +843,7 @@
         "hasBreadcrumbNav": false
       },
       "vitals": {
-        "lcp": 2152,
+        "lcp": 2164,
         "cls": 0,
         "ttfb": 2
       },
@@ -901,7 +901,7 @@
         "hasBreadcrumbNav": false
       },
       "vitals": {
-        "lcp": 2164,
+        "lcp": 2160,
         "cls": 0,
         "ttfb": 2
       },
@@ -959,7 +959,7 @@
         "hasBreadcrumbNav": false
       },
       "vitals": {
-        "lcp": 2164,
+        "lcp": 2172,
         "cls": 0,
         "ttfb": 2
       },
@@ -1017,7 +1017,7 @@
         "hasBreadcrumbNav": false
       },
       "vitals": {
-        "lcp": 2152,
+        "lcp": 2168,
         "cls": 0,
         "ttfb": 2
       },
@@ -1075,9 +1075,9 @@
         "hasBreadcrumbNav": false
       },
       "vitals": {
-        "lcp": 2172,
+        "lcp": 2164,
         "cls": 0,
-        "ttfb": 3
+        "ttfb": 2
       },
       "schema": {
         "blocks": 1,
@@ -1133,7 +1133,7 @@
         "hasBreadcrumbNav": false
       },
       "vitals": {
-        "lcp": 2180,
+        "lcp": 2168,
         "cls": 0,
         "ttfb": 2
       },
@@ -1191,7 +1191,7 @@
         "hasBreadcrumbNav": false
       },
       "vitals": {
-        "lcp": 2164,
+        "lcp": 2156,
         "cls": 0,
         "ttfb": 2
       },
@@ -1249,7 +1249,7 @@
         "hasBreadcrumbNav": false
       },
       "vitals": {
-        "lcp": 2172,
+        "lcp": 2164,
         "cls": 0,
         "ttfb": 2
       },
@@ -1307,9 +1307,9 @@
         "hasBreadcrumbNav": false
       },
       "vitals": {
-        "lcp": 2164,
+        "lcp": 2172,
         "cls": 0,
-        "ttfb": 3
+        "ttfb": 2
       },
       "schema": {
         "blocks": 1,

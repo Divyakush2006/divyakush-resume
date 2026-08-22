@@ -193,7 +193,17 @@ for (const doc of routes) {
 
 /* ── The files that are not documents ─────────────────────────── */
 
-for (const file of ['sitemap.xml', 'llms.txt', 'robots.txt', '_headers', '_redirects', '404.html', 'og-image.png', 'favicon.svg', 'ga.js']) {
+for (const file of [
+  'sitemap.xml', 'llms.txt', 'robots.txt', '_headers', '_redirects', '404.html',
+  'og-image.png', 'favicon.svg', 'ga.js',
+  /* Carried over from the site this one replaced. Each is referenced
+     from somewhere outside this repo — the manifest by a <link> in the
+     layout, the IndexNow key by Bing's verification fetch, humans.txt
+     by convention — so losing one is silent until something external
+     asks for it. */
+  'manifest.json', 'humans.txt', 'profile.jpg',
+  '031efabb1f4325fc803bd6dae35356e0.txt',
+]) {
   if (!fs.existsSync(path.join(OUT, file))) fail(`missing ${file}`);
 }
 
