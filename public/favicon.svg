@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- "Dk" on the theme's own three colours: ink #0B0B0C behind, accent
+       #C8FF00 on the D, bone-raised #F4F2EC on the k.
+
+       The D is the original mark's path, untouched — same letterform,
+       same 8-unit stem, same 28-unit cap height. Only the glyph beside
+       it changed, from a slash to a k.
+
+       Both are drawn rather than set as <text>. The display face
+       (Tr 3 A) is hotlinked from a third-party CDN and a favicon
+       document does not fetch external fonts, so <text> would fall back
+       to whatever local sans each browser happened to have — a
+       different mark on every machine.
+
+       The k is scaled to 0.72 about its own baseline corner, so it is
+       plainly smaller than the D while keeping its letterform exactly:
+       a uniform scale takes the 8-unit stroke down to 5.8 with it,
+       which is what stops it reading as a different, lighter face. The
+       two sit on one baseline at y=46 and are kerned hard — about 2
+       units between the bowl and the k's stem, tighter than any text
+       setting would give. At 16px they have to read as one mark rather
+       than as two letters.
+
+       The pair is nudged 2.5 units left to centre in the square; the D
+       alone was centred back when it stood next to a slash. -->
+  <rect width="64" height="64" rx="14" fill="#0B0B0C"/>
+  <g transform="translate(-2.5 0)">
+    <path d="M14 46V18h10.5c8.6 0 14 5.4 14 14s-5.4 14-14 14H14Zm8-7h2.2c4.2 0 6.8-2.7 6.8-7s-2.6-7-6.8-7H22v14Z" fill="#C8FF00"/>
+    <g fill="none" stroke="#F4F2EC" stroke-width="8" stroke-linejoin="round"
+       transform="translate(44 46) scale(0.72) translate(-44 -46)">
+      <path d="M44 18v28"/>
+      <path d="M48 34.5 56 26.5M48 34.5 57 46"/>
+    </g>
+  </g>
+</svg>

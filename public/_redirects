@@ -1,0 +1,23 @@
+# Deliberately empty of rules.
+#
+# This file used to carry `/*  /index.html  200` — the standard SPA
+# fallback for a client-rendered site with one document. It cannot come
+# back, for a reason that outlived the framework it was written against.
+#
+# The build writes a real document per route: out/projects/netra.html,
+# out/insights/devjams.html, and twenty-one more, each with its own
+# title, description, canonical, Open Graph and JSON-LD. Cloudflare's
+# own documentation says redirects "are always followed, regardless of
+# whether or not an asset matches the incoming request" — so a catch-all
+# would shadow every one of those files and serve the homepage's title
+# and canonical for all of them. That is the exact bug the per-route
+# documents exist to fix, and it would be invisible in a browser.
+#
+# Nothing is lost by leaving it empty. Pages serves <path>.html for
+# <path> on its own, so every valid route answers. Unknown paths fall to
+# out/404.html and return a real 404 status rather than 200-with-a-
+# 404-page, which is a soft 404 and something Google reports as an
+# error.
+#
+# scripts/serve-dist.mjs reproduces both behaviours locally, and
+# scripts/audit-site.mjs fails if either stops holding.

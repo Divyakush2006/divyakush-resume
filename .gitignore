@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Build output
+.next/
+out/
+dist/
+
+# Visual-regression captures — regenerate with `npm run snapshot`.
+# Forty-eight full-page PNGs per run; they are evidence, not source.
+.baseline/
+.next-out/
+.after*/
+
+# Local scratch
+*.log
+.DS_Store
+Thumbs.db
+
+# Generated, and checked in on purpose:
+#   src/lib/image-fallbacks.generated.ts
+# It is written by scripts/images.mjs at the start of every build, but it
+# is also the thing `tsc` needs to typecheck the app, so a clone without
+# it cannot even be linted until someone runs the build. Committed.
+
+# Control captures from the compositing investigation.
+.control/

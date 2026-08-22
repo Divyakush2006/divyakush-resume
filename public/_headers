@@ -1,0 +1,188 @@
+# Response headers for Cloudflare Pages.
+#
+# Rules are matched top to bottom and every matching block applies, so
+# the broad security block comes first and the narrower caching blocks
+# refine it. This file is served as configuration, never as a page.
+# Next copies it from public/ into the export untouched.
+#
+# ── Why each header is here ──────────────────────────────────────────
+#
+# Content-Security-Policy is the one worth reading carefully, because
+# every source below is one this site actually uses and nothing else is
+# allowed. Working through it:
+#
+#   default-src 'self'      Anything not named below is same-origin only.
+#
+#   script-src  'self'      All application code is external files under
+#                           /_next/static/.
+#
+#               'unsafe-inline'
+#                           This is a real concession and it is worth
+#                           being exact about why it is here, what it
+#                           costs, and what was tried instead.
+#
+#                           Next's static export writes two inline
+#                           scripts into every document. One is a
+#                           four-word bootstrap, identical everywhere.
+#                           The other is the React flight payload — the
+#                           serialised server-component tree for that
+#                           route — and it is different on all
+#                           twenty-four documents by construction. Both
+#                           execute, so both need to be allowed.
+#
+#                           Hashing them is the right answer and it does
+#                           not fit this host. A sha256 for each would
+#                           mean either one /* policy carrying all
+#                           twenty-five hashes — about 2.5KB of headers
+#                           on every response, including each of the 150
+#                           images a page pulls — or a per-path policy
+#                           per document, which needs Cloudflare to
+#                           override rather than combine a duplicated
+#                           header. When two CSP headers are present a
+#                           browser enforces the intersection of them,
+#                           so if Pages combines instead of overriding,
+#                           the narrower per-path policy meets a /*
+#                           policy that does not know the hash and the
+#                           whole site stops executing. That is a
+#                           blank-page failure resting on undocumented
+#                           behaviour, and it is a worse risk than the
+#                           one it removes.
+#
+#                           What it costs: 'unsafe-inline' would let an
+#                           attacker who could already inject markup run
+#                           script. On this site nothing renders
+#                           attacker-controlled markup — there is no
+#                           user content, no reflected query parameter,
+#                           and the one dangerouslySetInnerHTML is the
+#                           JSON-LD block, which is generated from the
+#                           project's own data and escapes `<`. So this
+#                           is a loss of defence in depth, not of a
+#                           control that was stopping anything.
+#
+#                           scripts/audit-csp.mjs serves the export with
+#                           this exact policy applied and fails on any
+#                           violation, so what is written here is what
+#                           has been tested rather than what was
+#                           intended.
+#
+#               www.googletagmanager.com
+#                           Where gtag.js is served from. The bootstrap
+#                           half of the GA4 snippet is /ga.js on this
+#                           origin — a file rather than an inline block,
+#                           which is what it should have been either
+#                           way. See the note in public/ga.js.
+#
+#   style-src   'unsafe-inline'
+#                           Required, and not lazily. React renders the
+#                           style={{...}} prop as a style attribute, and
+#                           motion writes transforms into that same
+#                           attribute on every animation frame. Both are
+#                           inline styles as far as CSP is concerned.
+#                           There is no nonce or hash mechanism that
+#                           covers attribute styles, so a stricter value
+#                           would leave the site unstyled and unmoving.
+#
+#   img-src     data:       The certificate wall paints a moving glare
+#                           over each card with an inline gradient.
+#
+#   font-src                Two third-party origins, both load-bearing:
+#                           Google serves Inter and JetBrains Mono, and
+#                           the Webflow CDN serves the two display faces
+#                           declared in src/index.css. See the note in
+#                           the audit about that second one — it is a
+#                           dependency on somebody else's asset host and
+#                           it should not stay one forever.
+#
+#   connect-src formsubmit.co
+#                           The contact form posts to the FormSubmit
+#                           AJAX endpoint.
+#
+#   ── Google Analytics 4 ──────────────────────────────────────────
+#   Measurement ID G-59EFGHFFHF. Three directives carry it, because a
+#   GA4 tag touches three:
+#
+#     script-src  www.googletagmanager.com   (above)
+#
+#     connect-src *.google-analytics.com, *.analytics.google.com,
+#                 stats.g.doubleclick.net
+#                           Where events are POSTed. The wildcards are
+#                           not laziness: GA4 sends to a regional
+#                           endpoint chosen at runtime — region1,
+#                           region4 and so on — so the exact host is not
+#                           known when this file is written.
+#
+#     img-src     www.google-analytics.com, www.googletagmanager.com,
+#                 *.g.doubleclick.net
+#                           Two different beacons. The measurement one
+#                           falls back to a GET on an image when
+#                           sendBeacon and fetch are both unavailable,
+#                           which is still the path on some older mobile
+#                           browsers. The tag itself also loads a 1x1
+#                           from googletagmanager.com/a on every page —
+#                           found by the site audit, which reported it as
+#                           a CSP violation on six pages before this line
+#                           existed.
+#
+#   Nothing here grants Google a frame, a font or a style. If a tag ever
+#   needs one, it should be argued for rather than added.
+#
+#   frame-ancestors 'none'  Nothing may frame this site. Replaces the
+#                           older X-Frame-Options, which is kept below
+#                           only for browsers that predate CSP Level 2.
+#
+#   base-uri 'self'         Stops an injected <base> from re-pointing
+#                           every relative URL on the page at another
+#                           host.
+#
+#   object-src 'none'       No Flash, no applets, no <embed>. Nothing
+#                           here needs them and they are a classic
+#                           injection surface.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com https://*.g.doubleclick.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.prod.website-files.com; connect-src 'self' https://formsubmit.co https://*.google-analytics.com https://*.analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; object-src 'none'; upgrade-insecure-requests
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Cross-Origin-Opener-Policy: same-origin
+  X-DNS-Prefetch-Control: on
+
+# Hashed build output — every JavaScript chunk, every stylesheet, and
+# every image imported by a module. The filename changes whenever the
+# bytes change, so these can be cached permanently and never
+# revalidated. This replaces the /assets/* rule the Vite build used;
+# the directory is Next's, the reasoning is identical.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Images under public/ keep their filenames across deploys, so they get
+# a long cache with revalidation rather than an immutable one.
+/certificates/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/insights/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+# Documents must not be cached hard. Each route is a real file written
+# by the export, and a stale one would serve last deploy's title,
+# canonical and structured data.
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# The GA4 bootstrap. Short cache: it carries a measurement ID, and a
+# year-long one would make changing that ID a wait rather than a deploy.
+/ga.js
+  Cache-Control: public, max-age=3600
+
+# Crawler-facing files change independently of a deploy.
+/sitemap.xml
+  Cache-Control: public, max-age=3600
+
+/robots.txt
+  Cache-Control: public, max-age=3600
+
+/llms.txt
+  Cache-Control: public, max-age=3600

@@ -1,0 +1,149 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────────────────────────
+   FONTS
+   `Tr 3 A` and `PP Neue Montreal` are hotlinked from a third-party
+   Webflow CDN. They are kept for visual continuity but every stack
+   falls back to Inter → system-ui, so a CDN outage degrades the type
+   rather than breaking the layout. font-display:swap prevents an
+   invisible-text flash blocking first paint.
+   ───────────────────────────────────────────────────────────────── */
+@font-face {
+  font-family: 'Tr 3 A';
+  src: url('https://cdn.prod.website-files.com/691d7c9f14d0280ebe2d4108/691d8ab14cbd4a1cf9811e7a_tr3a-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'PP Neue Montreal';
+  src: url('https://cdn.prod.website-files.com/691d7c9f14d0280ebe2d4108/691d8a7b11b33d4b469b6f1c_ppneuemontreal-bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+/* The capability wall is set in Inter Black to match the old
+   portfolio. Nothing to declare here — app/layout.tsx already loads Inter
+   400–900 from Google Fonts, so the 900 the wall asks for is a face
+   the page has rather than a synthesised bold. See `fontFamily.wall`
+   in tailwind.config.js. */
+@font-face {
+  font-family: 'PP Neue Montreal Book';
+  src: url('https://cdn.prod.website-files.com/691d7c9f14d0280ebe2d4108/691d8a7bc4e9f35b184ed616_ppneuemontreal-book.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  :root {
+    --nav-h: 64px;
+    color-scheme: light dark;
+  }
+
+  html {
+    /* Anchor targets clear the fixed nav instead of hiding beneath it. */
+    scroll-padding-top: calc(var(--nav-h) + 24px);
+    -webkit-text-size-adjust: 100%;
+    /* The scrollbar gutter is reserved whether or not the bar is drawn.
+       The certificate lightbox locks scrolling with `overflow: hidden`
+       on <body>; without a stable gutter that reclaims 10px and the
+       whole page — plus the fixed nav, which body padding cannot move
+       — jumps sideways the moment a certificate opens. */
+    scrollbar-gutter: stable;
+  }
+
+  /* Smooth scroll is opt-in, never forced on users who disable motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+  }
+
+  body {
+    background-color: #0B0B0C;
+    color: #F4F2EC;
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* A single global focus treatment. The old build had none at all —
+     the entire site was unusable by keyboard. */
+  :focus-visible {
+    outline: 2px solid #C8FF00;
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  /* On bone surfaces the bright accent ring fails contrast; darken it. */
+  .on-light :focus-visible,
+  .on-light:focus-visible {
+    outline-color: #1A1A1A;
+  }
+
+  /* Kill every transition/animation for reduced-motion users, including
+     Motion's inline styles, rather than only the ones we remembered. */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  ::selection {
+    background: #C8FF00;
+    color: #0B0B0C;
+  }
+}
+
+@layer components {
+  /* The section eyebrow used by every section header. */
+  .eyebrow {
+    @apply font-mono text-meta-sm uppercase flex items-center gap-2.5;
+  }
+}
+
+@layer utilities {
+  /* Horizontal-only scroll containment. `overflow-x:hidden` on <body>
+     silently breaks position:sticky in some engines, so it lives on a
+     wrapper element instead. */
+  .clip-x {
+    overflow-x: clip;
+  }
+
+  /* Fixed decorative layers must never eat clicks once faded out.
+     The old hero left invisible z-30 panels covering the viewport. */
+  .inert-layer {
+    pointer-events: none;
+  }
+  .inert-layer a,
+  .inert-layer button {
+    pointer-events: auto;
+  }
+}
+
+/* ── Capability wall: pause under the pointer ─────────────────────
+   `animation-play-state` cannot ride along as a utility beside
+   `animate-wall-*`. Those set the `animation` *shorthand*, which
+   resets every `animation-*` longhand, so whether an
+   `[animation-play-state:paused]` utility survives comes down to
+   which of the two Tailwind happens to emit last — exactly how the
+   duration and direction on this section were silently lost before.
+
+   A two-class descendant selector outranks the single-class utility
+   on specificity, which does not depend on emission order at all. */
+.wall-row:hover .wall-track,
+.wall-row:focus-within .wall-track {
+  animation-play-state: paused;
+}
+
+/* Scrollbar — neutral, not accent-coloured. */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #0B0B0C; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  border: 2px solid #0B0B0C;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.26); }

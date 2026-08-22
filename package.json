@@ -1,0 +1,52 @@
+{
+  "name": "divyakush-portfolio",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "node scripts/images.mjs && tsc && next build && node scripts/post-build.mjs",
+    "serve": "node scripts/serve-dist.mjs",
+    "images": "node scripts/images.mjs",
+    "typecheck": "tsc",
+    "seo:check": "node scripts/seo-crawl.mjs",
+    "seo:og": "node scripts/generate-og-image.mjs",
+    "audit": "node scripts/audit-site.mjs",
+    "audit:responsive": "node scripts/audit-responsive.mjs",
+    "audit:perf": "node scripts/audit-perf.mjs",
+    "audit:mobile": "node scripts/audit-mobile.mjs",
+    "audit:scroll": "node scripts/audit-scroll.mjs",
+    "audit:mirrors": "node scripts/audit-mirrors.mjs",
+    "audit:motion": "node scripts/audit-motion.mjs",
+    "audit:lcp": "node scripts/audit-lcp.mjs",
+    "audit:picture": "node scripts/audit-picture.mjs",
+    "audit:fallbacks": "node scripts/audit-fallbacks.mjs",
+    "audit:csp": "node scripts/audit-csp.mjs",
+    "audit:navigation": "node scripts/audit-navigation.mjs",
+    "snapshot": "node scripts/snapshot.mjs",
+    "snapshot:diff": "node scripts/snapshot-diff.mjs"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.468.0",
+    "motion": "^11.18.2",
+    "next": "^16.3.2",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "tailwind-merge": "^2.5.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "autoprefixer": "^10.4.20",
+    "playwright-core": "^1.62.1",
+    "postcss": "^8.4.49",
+    "sharp": "^0.35.3",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.6.3"
+  },
+  "overrides": {
+    "nanoid": "^3.3.18"
+  }
+}

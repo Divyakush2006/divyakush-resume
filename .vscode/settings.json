@@ -1,0 +1,26 @@
+{
+  // VS Code's built-in CSS validator does not know Tailwind's at-rules and
+  // reports `@tailwind`, `@apply`, `@layer` and `@screen` as "Unknown at
+  // rule" errors. They are valid — PostCSS compiles them away — so the
+  // built-in linter is turned off for those and Tailwind IntelliSense is
+  // made the authority instead.
+  "css.lint.unknownAtRules": "ignore",
+  "scss.lint.unknownAtRules": "ignore",
+  "less.lint.unknownAtRules": "ignore",
+
+  // Treat CSS files as Tailwind CSS so IntelliSense activates.
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+
+  // Tailwind IntelliSense caches theme values from tailwind.config.js. If it
+  // reports colours that no longer exist (e.g. suggesting `accent.soft`),
+  // run "Developer: Reload Window" — the cache does not invalidate on save.
+  "tailwindCSS.experimental.configFile": "tailwind.config.js",
+
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+
+  "typescript.tsdk": "node_modules/typescript/lib"
+}

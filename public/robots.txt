@@ -1,0 +1,39 @@
+# robots.txt — https://www.divyakush.com
+# Divyakush Punjabi — Full Stack & AI Systems Engineer
+#
+# Everything here is public by design. Search crawlers and AI answer
+# engines are both welcome: this site exists to be found and cited.
+
+User-agent: *
+Allow: /
+
+# Answer engines, named explicitly. Several of these read a site once
+# and never return, so being open to them is worth more than it looks.
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+Sitemap: https://www.divyakush.com/sitemap.xml

@@ -1,0 +1,79 @@
+{
+  "cycle": 1,
+  "updated": "2026-08-21",
+  "phase": "4 — technical SEO complete on-site; blocked on deployment and Search Console for anything measurable beyond it",
+  "primaryDomain": "https://www.divyakush.com",
+  "hosting": "Cloudflare Pages",
+  "registrar": "BigRock",
+  "completed": [
+    "P0 canonical conflict — every route declared the homepage as canonical; now self-referencing and verified 22/22",
+    "P0 zero crawlable content without JavaScript — 6,280 words now in raw HTML across 22 documents",
+    "P0 soft 404 — unknown paths returned 200; now a real 404 with noindex",
+    "P0 no per-route title or description — 22 unique of each",
+    "P1 connected @graph with resolving @id references on every page, 0 dangling",
+    "P1 og:image absent while twitter:card declared summary_large_image — 1200x630 card generated",
+    "P1 no robots.txt or sitemap.xml in repo — both generated at build, sitemap carries image entries",
+    "P1 _redirects catch-all would shadow the per-route documents — removed",
+    "P2 llms.txt published",
+    "P2 GSC HTML verification token carried into the new build"
+  ],
+  "open": [
+    {
+      "id": "P0-1",
+      "issue": "This build is not deployed. www.divyakush.com still serves the previous site.",
+      "owner": "human",
+      "blocks": "every downstream measurement"
+    },
+    {
+      "id": "P0-2",
+      "issue": "Search Console not verified as a Domain property for divyakush.com",
+      "owner": "human",
+      "detail": "TXT record at BigRock. The HTML file token covers URL-prefix only."
+    },
+    {
+      "id": "P1-1",
+      "issue": "No analytics installed — no organic segmentation, no conversion tracking",
+      "owner": "human",
+      "detail": "Choose GA4 / Plausible / Umami; zero-budget favours Umami self-host or Cloudflare Web Analytics (free, no cookie banner)"
+    },
+    {
+      "id": "P1-2",
+      "issue": "Backlinks still point at old URLs or are missing",
+      "owner": "human",
+      "detail": "GitHub profile website field, every repo About, LinkedIn contact + Featured, dev.to, about.me — all byte-identical https://www.divyakush.com"
+    },
+    {
+      "id": "P2-1",
+      "issue": "LCP 1.9-2.1s on home and the 11 insight routes — hero portrait is the LCP element",
+      "owner": "agent",
+      "detail": "Lab, localhost. Re-measure on real hosting before optimising; preload + fetchpriority=high is the lever if it holds"
+    },
+    {
+      "id": "P2-2",
+      "issue": "Bing Webmaster Tools not set up; IndexNow not enabled",
+      "owner": "human"
+    }
+  ],
+  "declined": [
+    {
+      "what": "Keyword-stuffing the 300-term list into pages",
+      "why": "Zero volume, and it is the AI-spam pattern the brief itself forbids. The terms are used as vocabulary in titles, descriptions and prose where they are true."
+    },
+    {
+      "what": "hreflang for en-IN / en-US",
+      "why": "One site, one language, identical content. hreflang between identical URLs creates a duplicate-content signal rather than resolving one."
+    },
+    {
+      "what": "BreadcrumbList on insight routes",
+      "why": "They render no visible trail. Marking up a breadcrumb a reader cannot see is exactly what the structured-data guidelines prohibit."
+    },
+    {
+      "what": "FAQPage / HowTo schema",
+      "why": "No genuine FAQ or how-to content exists on the site."
+    },
+    {
+      "what": "AggregateRating",
+      "why": "No real, visible reviews. Fabricating them is a manual-action risk."
+    }
+  ]
+}
