@@ -1,4 +1,14 @@
-# Deliberately empty of rules.
+# _redirects — Cloudflare Pages. Path-level rules only.
+#
+# The apex → www redirect is NOT here and cannot be. `_redirects` is
+# matched per path, after Cloudflare has already resolved the hostname,
+# so it cannot see which host the request arrived on. divyakush.com →
+# www.divyakush.com is a zone-level Redirect Rule in the Cloudflare
+# dashboard; it is configured and currently returns 301 (verified:
+# http://divyakush.com → https://divyakush.com → https://www.divyakush.com).
+# Changing it means changing it there, not in this file.
+#
+# ── Why there are no path rules either ────────────────────────────
 #
 # This file used to carry `/*  /index.html  200` — the standard SPA
 # fallback for a client-rendered site with one document. It cannot come
