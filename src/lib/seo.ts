@@ -283,16 +283,40 @@ export function projectSeo(slug: string): RouteSeo | null {
         breadcrumb: { '@id': `${ORIGIN}${url}#breadcrumb` },
         mainEntity: { '@id': `${ORIGIN}${url}#software` },
       }),
-      /* Mirrors the trail the page actually renders: "Selected work /
-         <category>" above the H1. Nothing is claimed here that a
-         reader cannot see. */
+      /* Mirrors the trail the page renders — "Selected work /
+         <category>" above the H1 — as far as breadcrumb markup is
+         allowed to.
+
+         Search Console rejected the first version of this, and it was
+         wrong twice over:
+
+           1. Every ListItem except the last needs an `item`. Position 2
+              was the category and carried only a `name`, so the whole
+              BreadcrumbList was invalid — "Missing field 'item'".
+           2. Position 1 pointed at `${ORIGIN}/#work`. A fragment is not
+              a page. It resolves to the home page, so it was not
+              *wrong* exactly, but a breadcrumb item is a claim that a
+              distinct URL exists at that step and `/#work` is not one.
+              It also meant Search Console listed a `#work` URL in its
+              report, which is what a reader of that report will
+              reasonably ask about.
+
+         So the category is out of the markup and stays on the page.
+         There are no category pages on this site, so there is no URL to
+         give that step, and a step without a URL cannot legally sit in
+         the middle of a trail. Inventing one — pointing it back at the
+         project, or at another fragment — would be marking up a page
+         that does not exist, which is the thing this file refuses to do
+         everywhere else.
+
+         What is left is the shape Google documents and can verify: two
+         steps, both resolving to real documents. */
       {
         '@type': 'BreadcrumbList',
         '@id': `${ORIGIN}${url}#breadcrumb`,
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Selected work', item: `${ORIGIN}/#work` },
-          { '@type': 'ListItem', position: 2, name: p.category },
-          { '@type': 'ListItem', position: 3, name: p.title },
+          { '@type': 'ListItem', position: 1, name: 'Selected work', item: `${ORIGIN}/` },
+          { '@type': 'ListItem', position: 2, name: p.title, item: `${ORIGIN}${url}` },
         ],
       },
       {
