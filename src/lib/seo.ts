@@ -35,6 +35,8 @@
 
 import { PROJECTS } from './projects';
 import { INSIGHTS } from './insights';
+import { CERTIFICATIONS } from './certifications';
+import { IMAGES } from './image-fallbacks.generated';
 
 export const ORIGIN = 'https://www.divyakush.com';
 export const NAME = 'Divyakush Punjabi';
@@ -59,6 +61,52 @@ export const clamp = (s: string, n = 158) => {
   if (t.length <= n) return t;
   return t.slice(0, t.lastIndexOf(' ', n - 1)).replace(/[,;:—-]$/, '') + '…';
 };
+
+/* ── Dates ────────────────────────────────────────────────────────
+   The site prints dates the way a person writes them — "2024",
+   "Jun 2025" — because that is what belongs in a caption rail. A
+   search engine wants ISO 8601, and schema.org accepts a reduced
+   precision date: "2025-06" is a valid, complete answer to "when",
+   and it is the *true* one.
+
+   The temptation is to write "2025-06-01" because it looks more
+   official and every validator stops complaining. That is a fact
+   nobody has: the certificate says June, not the first of June.
+   Reduced precision in, reduced precision out; unparseable in,
+   nothing out, and the property is omitted rather than guessed. */
+const MONTHS: Record<string, string> = {
+  jan: '01', feb: '02', mar: '03', apr: '04', may: '05', jun: '06',
+  jul: '07', aug: '08', sep: '09', oct: '10', nov: '11', dec: '12',
+};
+
+export function isoDate(printed: string | undefined): string | undefined {
+  if (!printed) return undefined;
+
+  /* A range — "23 Mar — 20 Jul 2025", "Jan 2025 — Jun 2026" — resolves
+     to its end. These are all programmes and internships, and the date
+     on a credential is the date it was awarded, which is when the thing
+     finished. Only the end carries a year in the shorter forms anyway. */
+  const s = printed.trim().split(/\s+[—–-]\s+/).pop()!.trim();
+
+  /* "13 July 2025". The one form on the site that prints a real day, so
+     it is the one form that gets day precision. */
+  const dayMonthYear = /^(\d{1,2})\s+([A-Za-z]{3,})\.?\s+(\d{4})$/.exec(s);
+  if (dayMonthYear) {
+    const m = MONTHS[dayMonthYear[2].slice(0, 3).toLowerCase()];
+    if (m) return `${dayMonthYear[3]}-${m}-${dayMonthYear[1].padStart(2, '0')}`;
+  }
+
+  const monthYear = /^([A-Za-z]{3,})\.?\s+(\d{4})$/.exec(s);
+  if (monthYear) {
+    const m = MONTHS[monthYear[1].slice(0, 3).toLowerCase()];
+    if (m) return `${monthYear[2]}-${m}`;
+  }
+
+  const year = /^(\d{4})$/.exec(s);
+  if (year) return year[1];
+
+  return undefined;
+}
 
 type Node = Record<string, unknown>;
 
@@ -100,6 +148,44 @@ const person: Node = {
   ],
   image: { '@id': `${ORIGIN}/#logo` },
   sameAs: SAME_AS,
+};
+
+/* ── Credentials ──────────────────────────────────────────────────
+   The eighteen documents the Certifications section renders, as
+   schema. Every one of them is on the page, openable full size, and
+   several print a credential number that can be checked against the
+   issuer — which is the whole test for whether a claim belongs in
+   structured data at all.
+
+   This is the strongest entity signal on the site. "Divyakush Punjabi"
+   is a name; a person who holds a named credential, issued by a named
+   organisation, on a named date, is an entity a knowledge graph can
+   place — and it is what an answer engine reaches for when it is asked
+   to say who somebody is rather than to list pages about them.
+
+   Attached to the home page's Person node and nowhere else. It is the
+   same @id everywhere, so a consumer assembling the graph gets the
+   full description from the page that is *about* the person; repeating
+   four kilobytes of it on all twenty-three documents would buy nothing
+   and be paid for on every request. */
+const credentials: Node[] = CERTIFICATIONS.map((c) => ({
+  '@type': 'EducationalOccupationalCredential',
+  name: c.title,
+  credentialCategory: c.track,
+  recognizedBy: { '@type': 'Organization', name: c.issuer },
+  ...(isoDate(c.date) ? { dateCreated: isoDate(c.date) } : {}),
+  ...(c.credentialId ? { identifier: c.credentialId } : {}),
+}));
+
+/** The full description of the entity, for the page that is about it. */
+const personFull: Node = {
+  ...person,
+  description:
+    `${NAME} is a full stack and AI systems engineer. He leads engineering at ` +
+    'LMX Labs across two live platforms, reads a B.Tech in Computer Engineering ' +
+    'at Vellore Institute of Technology, and holds a Major Degree in Artificial ' +
+    'Intelligence from IIT Ropar.',
+  hasCredential: credentials,
 };
 
 /** The share card doubles as the entity's image. One file, one node. */
@@ -150,7 +236,7 @@ export const homeSeo = (): RouteSeo => ({
     `Selected work: ${PROJECTS.slice(0, 6).map((p) => p.title).join(', ')}.`,
   ],
   schema: [
-    person,
+    personFull,
     logo,
     website,
     webPage('/', `${NAME} — ${ROLE}`, 'Portfolio and record of work.', {
@@ -250,6 +336,15 @@ export function insightSeo(slug: string): RouteSeo | null {
         url: `${ORIGIN}${i.image}`,
         contentUrl: `${ORIGIN}${i.image}`,
         caption: `${i.title}${i.location ? `, ${i.location}` : ''}`,
+        /* Read off the file by scripts/images.mjs, never typed in.
+           Google's Article guidance asks for the image's dimensions,
+           and a hand-written pair is wrong the first time a photograph
+           is recropped — silently, because nothing validates a number
+           against the file it describes. Omitted rather than guessed
+           if the master is not in the generated map. */
+        ...(IMAGES[i.image]
+          ? { width: IMAGES[i.image].width, height: IMAGES[i.image].height }
+          : {}),
       },
       {
         '@type': 'Article',
@@ -258,6 +353,15 @@ export function insightSeo(slug: string): RouteSeo | null {
         description: clamp(i.blurb, 400),
         url: `${ORIGIN}${url}`,
         author: { '@id': `${ORIGIN}/#person` },
+        inLanguage: 'en',
+        /* When it happened, at the precision the caption rail prints.
+           An Article with no date is ineligible for several of Google's
+           article treatments outright, and every answer engine weighs
+           recency — so the absence was costing something on all twelve
+           of these. No `dateModified`: nothing here tracks when a story
+           was last edited, and inventing one to satisfy a validator is
+           the same class of mistake as inventing a rating. */
+        ...(isoDate(i.date) ? { datePublished: isoDate(i.date) } : {}),
         ...(i.location ? { contentLocation: { '@type': 'Place', name: i.location } } : {}),
         image: { '@id': `${ORIGIN}${url}#primaryimage` },
         publisher: { '@id': `${ORIGIN}/#person` },

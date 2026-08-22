@@ -1,21 +1,30 @@
 {
-  "cycle": 1,
-  "updated": "2026-08-21",
-  "phase": "4 — technical SEO complete on-site; blocked on deployment and Search Console for anything measurable beyond it",
+  "cycle": 2,
+  "updated": "2026-08-22",
+  "phase": "5 — technical SEO and GEO complete on-site, ported to Next 16 and re-verified; still blocked on deployment and Search Console for anything measurable beyond it",
   "primaryDomain": "https://www.divyakush.com",
   "hosting": "Cloudflare Pages",
   "registrar": "BigRock",
+  "stack": "Next 16.3 App Router, output: 'export' · React 19 · Tailwind 3 · motion 11",
   "completed": [
-    "P0 canonical conflict — every route declared the homepage as canonical; now self-referencing and verified 22/22",
-    "P0 zero crawlable content without JavaScript — 6,280 words now in raw HTML across 22 documents",
+    "P0 canonical conflict — every route declared the homepage as canonical; now self-referencing and verified 23/23",
+    "P0 zero crawlable content without JavaScript — the full prose of every page ships in <noscript> across 23 documents",
     "P0 soft 404 — unknown paths returned 200; now a real 404 with noindex",
-    "P0 no per-route title or description — 22 unique of each",
-    "P1 connected @graph with resolving @id references on every page, 0 dangling",
+    "P0 no per-route title or description — 23 unique of each",
+    "P1 connected @graph with resolving @id references on every page, verified 0 dangling across all 23 documents",
     "P1 og:image absent while twitter:card declared summary_large_image — 1200x630 card generated",
     "P1 no robots.txt or sitemap.xml in repo — both generated at build, sitemap carries image entries",
     "P1 _redirects catch-all would shadow the per-route documents — removed",
     "P2 llms.txt published",
-    "P2 GSC HTML verification token carried into the new build"
+    "P2 GSC HTML verification token carried into the new build",
+    "C2 ported to Next 16 — scripts/seo-build.mjs deleted, replaced by src/lib/seo.ts + generateMetadata per route; head, JSON-LD and noscript verified byte-identical to the Vite build on all 23 routes",
+    "C2 GA4 installed — G-59EFGHFFHF, loader plus a same-origin /ga.js bootstrap so script-src needed no second concession; page_view verified reaching /g/collect under the shipping CSP",
+    "C2 version control — git initialised 22 Aug 2026; the repo had never been under it",
+    "C2 Article.datePublished on all 12 insight routes — they carried none, which made them ineligible for Google's article treatments and gave answer engines no recency signal. Precision matches what the caption rail prints; no dateModified, because nothing tracks edits",
+    "C2 Person.hasCredential — 12 credentials with issuer, category, date and, where the document prints one, the credential number. The strongest entity signal on the site, and every claim is visible in the Certifications section",
+    "C2 Person.description on the home page's Person node",
+    "C2 ImageObject width/height on insight primary images, read off the files by scripts/images.mjs rather than typed",
+    "C2 sitemap lastmod was the build time on every URL on every deploy — a field Google discounts when it is that obviously unreliable. Now derived from the last commit touching each route's data file"
   ],
   "open": [
     {
@@ -28,30 +37,36 @@
       "id": "P0-2",
       "issue": "Search Console not verified as a Domain property for divyakush.com",
       "owner": "human",
-      "detail": "TXT record at BigRock. The HTML file token covers URL-prefix only."
+      "detail": "TXT record at BigRock. The HTML file token covers URL-prefix only. Submit https://www.divyakush.com/sitemap.xml once verified."
     },
     {
-      "id": "P1-1",
-      "issue": "No analytics installed — no organic segmentation, no conversion tracking",
+      "id": "P0-3",
+      "issue": "The contact form does not deliver mail until FormSubmit is activated",
       "owner": "human",
-      "detail": "Choose GA4 / Plausible / Umami; zero-budget favours Umami self-host or Cloudflare Web Analytics (free, no cookie banner)"
+      "detail": "Submit the live form once, click the activation email, then paste the random alias it returns over CONTACT_FORM.token in src/lib/content.ts. That also removes the raw address from the shipped bundle, where it is currently greppable."
     },
     {
       "id": "P1-2",
       "issue": "Backlinks still point at old URLs or are missing",
       "owner": "human",
-      "detail": "GitHub profile website field, every repo About, LinkedIn contact + Featured, dev.to, about.me — all byte-identical https://www.divyakush.com"
+      "detail": "GitHub profile website field, every repo About, LinkedIn contact + Featured, dev.to, about.me — all byte-identical https://www.divyakush.com. These are the six URLs in SAME_AS and entity resolution is string matching."
     },
     {
       "id": "P2-1",
-      "issue": "LCP 1.9-2.1s on home and the 11 insight routes — hero portrait is the LCP element",
+      "issue": "LCP 2.2-2.5s on home and the 12 insight routes — hero portrait is the LCP element",
       "owner": "agent",
-      "detail": "Lab, localhost. Re-measure on real hosting before optimising; preload + fetchpriority=high is the lever if it holds"
+      "detail": "Lab, localhost, high variance. Re-measure on real hosting before optimising. Preload + fetchpriority=high already in place."
     },
     {
       "id": "P2-2",
       "issue": "Bing Webmaster Tools not set up; IndexNow not enabled",
       "owner": "human"
+    },
+    {
+      "id": "P2-3",
+      "issue": "Two display faces hotlinked from a Webflow CDN",
+      "owner": "agent",
+      "detail": "cdn.prod.website-files.com is an asset host nobody here controls; if it moves, the typography falls back site-wide. next/font would self-host and hash them — but it changes which bytes arrive and how fallback metrics are computed, which is a typography change wearing a performance change's clothes. Deliberate decision required."
     }
   ],
   "declined": [
@@ -74,6 +89,14 @@
     {
       "what": "AggregateRating",
       "why": "No real, visible reviews. Fabricating them is a manual-action risk."
+    },
+    {
+      "what": "Article.dateModified",
+      "why": "Nothing tracks when a story was last edited. Emitting the build date as dateModified would tell every crawler all twelve articles are revised on every deploy, which is false and is the same class of mistake the sitemap lastmod fix just corrected."
+    },
+    {
+      "what": "A guarantee of #1 rankings",
+      "why": "Not something any technical work can promise. Rank is decided by a third party against competitors nobody here controls. What is controllable is done and verified; the rest is deployment, Search Console, and earned links."
     }
   ]
 }

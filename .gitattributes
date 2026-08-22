@@ -1,0 +1,19 @@
+# Normalise line endings.
+#
+# Without this, the first `git add` on Windows warns on ~100 files that
+# LF will become CRLF, and a clone on macOS or a Linux CI runner then
+# shows every one of them as modified. Text is stored LF in the repo and
+# checked out however the platform wants it.
+* text=auto eol=lf
+
+# Binary — never diffed, never normalised. A CRLF conversion inside a
+# WebP is a corrupted image.
+*.webp binary
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.ico  binary
+*.pdf  binary
+*.mp4  binary
+*.webm binary
+*.woff2 binary

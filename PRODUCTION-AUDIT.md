@@ -717,3 +717,172 @@ Unchanged from the list above, plus two the port added:
 - **Still no version control.** This remains the largest gap in the
   setup, and it is now a 90MB tarball in the parent directory standing
   in for it.
+
+---
+
+# Certifications hover, and the SEO the port left stale — 22 August 2026
+
+## The bug: hovering one certificate blanked the one beside it
+
+Reported as "hover a certificate, move the cursor out, the one next to
+it disappears for a second or two". It reproduced, and the cause was
+not in the neighbour at all.
+
+Three measurements off the built export, at 1500x1000 with the GPU on:
+
+| | before | after |
+|---|---|---|
+| composited layers, at rest | 52 | 27 |
+| composited layers, one card hovered | 67 | 27 |
+| how long the card keeps mutating after the pointer leaves | 795ms | 462ms, then released to `transform: none` |
+
+A single hover was taking the page from 52 composited layers to 67 and
+holding it there for the best part of a second. Three things did that,
+and all three were fixed in `src/components/CertificationsWall.tsx`:
+
+1. **`filter: grayscale()` and `transform: scale(1.03)` animating
+   together on the same `<img>`.** A CSS filter resolves at raster
+   time, so animating one *while the element is being scaled* makes the
+   browser run a fresh full-size filter pass over a 1414x1000 source on
+   every frame — eighteen of these on the page, sharing one raster
+   budget. When that budget is exceeded Chromium serves blank tiles for
+   whatever it has not finished, which is the disappearance. The zoom
+   now lives on a wrapper with no filter; the filter animates at a
+   fixed size where its result can be rastered once per step and
+   reused.
+
+2. **The tilt spring never stopped.** Measured at 5.7e-13 degrees still
+   animating 733ms after the pointer left. motion drives this through
+   the Web Animations API, and a running animation on `transform` pins
+   the element to its own layer for as long as it runs. `restDelta:
+   0.05` ends it when it stops being visible rather than when the float
+   maths runs out — a hundred-and-fortieth of a 7 degree tilt.
+
+3. **`transformStyle: preserve-3d` on all eighteen buttons.** Nothing
+   inside them is positioned in 3D, so it bought nothing, and it put
+   the whole grid into a permanent 3D rendering context that the
+   compositor cannot flatten or cache. Removing it alone halved the
+   at-rest layer count.
+
+Two smaller things fell out. `transform` was in the button's CSS
+`transition` list while motion rewrote that same property every frame,
+so a 300ms interpolation restarted on every frame; it is out of the
+list now. And `motion-safe:hover:-translate-y-1` had never rendered on
+any device — an inline transform beats a class one — so the intended
+lift was dead on arrival, and it was the only reason `transform` was in
+that list. It is removed rather than silently switched on: making it
+work is a design decision, not a bug fix.
+
+### The unexpected part
+
+Fixing this made a photograph on a different page render **better**.
+`/insights/nec-visionary-ventures` came back 4.1% different from the
+baseline, entirely inside the story photograph, as a pure edge map —
+the signature of a resampling change, not a layout shift. Mean
+absolute laplacian over the photo went 10.5 to 12.1: the new render is
+sharper, same framing, no ringing. The certifications section had been
+consuming enough compositing budget to push photographs elsewhere on
+the page onto the GPU's bilinear path.
+
+Both states are reachable on both the old and the new code — this
+image and `/insights/iit-ropar-complete` are bistable in the harness —
+and the fix biases toward the sharp one. **A clean run of the finished
+build is 48 of 48 pixel-identical to `.baseline`.**
+
+## SEO and GEO
+
+Verified first, then extended. Nothing here was broken; the gaps were
+things the Vite-era build never had and the port did not add.
+
+**Verified as shipping:** `robots.txt`, `sitemap.xml` and `llms.txt` all
+200 with correct content types under the real `_headers`; 23/23 unique
+titles and descriptions; a real 404 for an unknown path; and **0
+dangling @id references across all 23 JSON-LD graphs** — every @id
+reference resolves to a node in the same document.
+
+**Added:**
+
+- **`Article.datePublished` on all twelve insight routes.** They
+  carried no date at all, which makes an Article ineligible for several
+  of Google's article treatments outright and gives an answer engine
+  nothing to weigh for recency. `isoDate()` in `src/lib/seo.ts` parses
+  what the caption rail prints — "2024", "Jun 2025", "13 July 2025",
+  and ranges like "23 Mar to 20 Jul 2025", which resolve to their end
+  because a credential's date is the date it was awarded. Reduced
+  precision in, reduced precision out: "2025-06" is a complete ISO 8601
+  date and it is the true one. Padding a month out to -01 to quiet a
+  validator asserts a day nobody has.
+- **`Person.hasCredential` — twelve credentials**, each with issuer,
+  category, date and, where the document prints one, its credential
+  number. All twelve dates parse. This is the strongest entity signal
+  on the site: a name is a string, but a person holding named
+  credentials from named organisations on named dates is something a
+  knowledge graph can place. Attached to the home page's Person node
+  only — same @id everywhere, so a consumer assembling the graph gets
+  the full description from the page that is *about* the person, and
+  four kilobytes are not repeated on twenty-three documents.
+- **`Person.description`**, and **`inLanguage`** on Article.
+- **`ImageObject` width and height** on insight primary images, read
+  off the files by `scripts/images.mjs` rather than typed. A hand-written
+  dimension is wrong the first time a photograph is recropped,
+  silently.
+
+Measured cost of all of it: the home document went 19.1KB to 25.8KB and
+LCP did not move. Three runs with the credential block removed gave
+2408-2512ms; three runs with it gave 2432-2492ms. The JSON-LD is in the
+body and the hero preload sits at byte 155 of a 3.9KB head, so it was
+never in the way.
+
+**`sitemap.xml` lastmod was the build time, on every URL, on every
+deploy.** The old comment defended that as honest because a static
+export is rewritten in full each time — true about the files, but not
+what the field means. Google uses lastmod when it is demonstrably
+accurate and ignores it when it is not, and "all twenty-three changed
+just now, again" is how a site teaches it to stop reading the field.
+It now comes from the last commit touching each route's data file, with
+the build date as a fallback where git is unavailable. Redeploying
+without changing content leaves the dates alone, which is the point.
+
+**Declined:** `Article.dateModified`. Nothing tracks when a story was
+last edited, and emitting the build date would claim all twelve are
+revised on every deploy — the same mistake the lastmod fix just
+corrected.
+
+## Version control
+
+`git init`, 22 August 2026, 681 files. The repo had never been under
+version control; the previous audit called that the largest gap in the
+setup and it stayed open through a framework port. A `.gitattributes`
+normalises line endings so a clone on macOS or a Linux CI runner does
+not show a hundred files as modified.
+
+## Two build-time defects
+
+- `scripts/images.mjs` warned on every build that `cover.webp` and
+  `cover-a1b2.webp` were "imported but missing". Neither exists: the
+  scanner was reading the worked example inside the doc comment in
+  `src/lib/asset.ts` as a real import. Two false warnings on every
+  build is two warnings nobody reads, which is how a genuinely missing
+  asset gets past someone. Comments are stripped before matching now.
+- `seo/PLAYBOOK.md` still instructed the reader to edit
+  `scripts/seo-build.mjs`, which the port deleted, and `seo/STATE.json`
+  still listed "no analytics installed" and "still no version control".
+  Both now describe the site that exists.
+
+## Still open, and who owns it
+
+- **The contact form does not deliver mail until someone activates it**
+  (human). FormSubmit needs one live submission plus a click in the
+  activation email. The alias it returns then replaces the raw address
+  in `CONTACT_FORM.token`, which also takes that address out of the
+  shipped JavaScript, where it is currently greppable.
+- **Deploy, then Search Console** (human). Nothing downstream is
+  measurable until the build is live and the domain is verified.
+- **GA4 is recording localhost** (human). Add an internal-traffic
+  filter before trusting the first days of data.
+- **Two display faces hotlinked from a Webflow CDN** (decision).
+  `next/font` would self-host them, and would also change which bytes
+  arrive and how fallback metrics are computed — a typography change
+  wearing a performance change's clothes.
+- **motion 11 to 13** (decision). Still blocked on clipping the deck's
+  window maths to the range 0 to 1.

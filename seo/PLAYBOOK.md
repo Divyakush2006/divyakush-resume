@@ -5,16 +5,32 @@ and the breakage was measured. `scripts/seo-crawl.mjs` fails the build if any
 of it regresses, so the cheapest way to stay correct is to run it.
 
 ```
-npm run build          # includes the SEO pass
-npm run seo:check      # crawl dist/ and fail on any finding
+npm run build          # images -> tsc -> next build -> post-build assertions
+npm run serve          # serve out/ with the real _headers
+npm run seo:check      # crawl out/ and fail on any finding
 ```
+
+> **Ported to Next 16, 22 August 2026.** `scripts/seo-build.mjs` is gone. It
+> string-substituted a new `<head>` into `dist/index.html` twenty-three times
+> because a client-rendered SPA emits one document and Vite had no idea the
+> other twenty-two URLs existed. Next does. Everything that script did now
+> lives in **`src/lib/seo.ts`** plus a `generateMetadata` export per route,
+> and `scripts/post-build.mjs` asserts the result. Where this file used to
+> say `scripts/seo-build.mjs`, read `src/lib/seo.ts`.
 
 ## The five rules
 
-**1. Never hardcode a canonical in `index.html`.**
-It applies to every route. That single tag told Google not to index 21 pages of
-writing. `scripts/seo-build.mjs` strips whatever is in the shell and writes a
-correct self-referencing one per document.
+**1. Never hardcode a canonical in `app/layout.tsx`.**
+A canonical in the shared layout applies to every route. That single tag once
+told Google not to index 21 pages of writing. Each route's `generateMetadata`
+writes its own self-referencing canonical, and `scripts/post-build.mjs` fails
+the build if any document's canonical disagrees with the sitemap.
+
+The home page is the one special case: Next's metadata resolver strips the
+trailing slash off an origin, and the site has been indexed as
+`https://www.divyakush.com/` since it launched. `app/_seo/Document.tsx` writes
+that one as a literal tag and `app/_seo/metadata.ts` omits it from the
+resolver. Do not "tidy" this.
 
 **2. Never add a catch-all to `public/_redirects`.**
 `/* /index.html 200` shadows the 22 prerendered documents and serves the home
@@ -23,10 +39,20 @@ followed "regardless of whether or not an asset matches". Every valid route
 already has a file; unknown paths fall to `404.html` and return a real 404.
 
 **3. Schema is generated, never pasted.**
-One source of truth: the `@graph` builder in `scripts/seo-build.mjs`, reading
-`src/lib/projects.ts` and `src/lib/insights.ts` through esbuild. Add a project
-or an insight and its document, sitemap entry, `llms.txt` line and schema appear
-automatically. A second hand-maintained copy is wrong within a week.
+One source of truth: the `@graph` builders in `src/lib/seo.ts`, reading
+`src/lib/projects.ts`, `src/lib/insights.ts` and `src/lib/certifications.ts`
+directly. Add a project, an insight or a certificate and its document, sitemap
+entry, `llms.txt` line and schema appear automatically. A second
+hand-maintained copy is wrong within a week.
+
+Two rules inside the builders:
+
+- **Dates go through `isoDate()`.** The site prints "Jun 2025"; schema.org
+  wants ISO 8601, and a reduced-precision date is a complete answer. Never
+  pad a month out to `-01` to quiet a validator — that is a day nobody has.
+- **Image dimensions come from `IMAGES`**, which `scripts/images.mjs` reads
+  off the files. A width typed by hand is wrong the first time a photograph
+  is recropped, silently.
 
 **4. Mark up only what a reader can see.**
 `BreadcrumbList` is on project pages because project pages render a visible
@@ -50,13 +76,19 @@ npm run seo:check
 
 ## When you change the domain
 
-`ORIGIN` in `scripts/seo-build.mjs` is the only place it is written. Change it
-there, rebuild, and update `public/robots.txt`'s `Sitemap:` line.
+`ORIGIN` in `src/lib/seo.ts` is the only place it is written. Change it there,
+rebuild, and update `public/robots.txt`'s `Sitemap:` line and the `ORIGIN`
+constant in `scripts/post-build.mjs` that checks it.
 
-## When you add a route pattern to `App.tsx`
+## When you add a route pattern
 
-Add it to `routes()` in `scripts/seo-build.mjs` in the same commit, or it will
-404 in production — there is no SPA fallback any more, by design.
+Two places, same commit: a directory under `app/` with `generateMetadata` and
+`generateStaticParams`, and an entry in `allRoutes()` in `src/lib/seo.ts` so it
+reaches the sitemap and `llms.txt`. `src/App.tsx` also has to know which tree to
+render for it.
+
+Miss the first and it 404s in production — there is no SPA fallback, by design.
+Miss the second and it is never crawled, which nothing will tell you.
 
 ## What must never be done
 
@@ -68,3 +100,8 @@ Add it to `routes()` in `scripts/seo-build.mjs` in the same commit, or it will
 - Buying links, PBNs, automated outreach.
 - Claiming a rank or a metric that has not been measured. If it cannot be
   measured, it is `UNMEASURED`.
+- Structured data describing something the page does not show. `hasCredential`
+  is on the Person node because the Certifications section renders all twelve
+  documents and several print a checkable credential number. That is the test.
+  `AggregateRating`, `FAQPage` and a `BreadcrumbList` on the insight routes all
+  fail it and are all deliberately absent.

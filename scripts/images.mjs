@@ -77,7 +77,20 @@ function importedAssets() {
          called things like `algoverse_arena-1200-800-400.webp`. */
       if (d.name === 'image-fallbacks.generated.ts') continue;
 
-      const text = readFileSync(p, 'utf8');
+      /* Comments are stripped before matching. src/lib/asset.ts
+         documents the bundler difference with a worked example —
+         `import cover from '../assets/cover.webp'` — and a plain regex
+         over the file text reads that prose as a real import, then
+         warns that a file nobody ever referenced is missing. Two false
+         warnings on every build is two warnings nobody reads, which is
+         how a genuinely missing asset gets past someone.
+
+         Block comments and whole-line `//` only. The `//` inside a
+         `https://` URL is never at the start of a line, so it
+         survives. */
+      const text = readFileSync(p, 'utf8')
+        .replace(/\/\*[\s\S]*?\*\//g, ' ')
+        .replace(/^[^\S\n]*\/\/.*$/gm, ' ');
       for (const m of text.matchAll(/assets\/([^'"`]+?)\.webp/g)) found.add(m[1]);
     }
   };
@@ -175,7 +188,12 @@ async function build(dir, name) {
   if (made) {
     console.log(`  ${name.padEnd(34)} ${String(meta.width).padStart(5)}px  +${made} files  [${rungs.join(', ')}]`);
   }
-  return { fallback, widths };
+  /* The master's intrinsic size travels with the entry. It is read
+     here anyway, and it is the only honest source for the width and
+     height the JSON-LD ImageObject nodes publish — a dimension typed
+     into a data file by hand goes stale the first time a photograph is
+     recropped, and nothing catches it. */
+  return { fallback, widths, width: meta.width, height: meta.height };
 }
 
 /* ── 1. Bundled assets ────────────────────────────────────────────── */
@@ -231,6 +249,8 @@ built.forEach((b, i) => {
     `  [asset(${ident(i, `_${safe}`)})]: {\n` +
     `    fallback: asset(${ident(i, `_${safe}_f`)}),\n` +
     `    webp: \`${webpParts.join(', ')}\`,\n` +
+    `    width: ${b.width},\n` +
+    `    height: ${b.height},\n` +
     `  },`
   );
 });
@@ -261,6 +281,8 @@ for (const dir of ['public/certificates', 'public/insights']) {
       `  '${urlBase}/${name}.webp': {\n` +
       `    fallback: '${urlBase}/${r.fallback}',\n` +
       `    webp: '${webp}',\n` +
+      `    width: ${r.width},\n` +
+      `    height: ${r.height},\n` +
       `  },`
     );
   }
@@ -273,6 +295,10 @@ lines.push(
   '  fallback: string;',
   '  /** srcset for the WebP ladder. */',
   '  webp: string;',
+  "  /** The master's intrinsic width, in pixels. */",
+  '  width: number;',
+  "  /** The master's intrinsic height, in pixels. */",
+  '  height: number;',
   '}',
   '',
   'export const IMAGES: Readonly<Record<string, ImageSet>> = {',
