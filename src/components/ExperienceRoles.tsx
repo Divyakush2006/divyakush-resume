@@ -80,10 +80,10 @@ const ROLES: Role[] = [
   {
     company: 'LMX Labs',
     title: 'Software Engineering Lead',
-    period: 'Jun 2026 — Present',
-    span: '2026 —',
+    period: 'Jun 2026 — Jul 2026',
+    span: '2026',
     mode: 'On-site · Team lead',
-    term: 'Ongoing',
+    term: 'Two months',
     mandate:
       'Sole technical lead for the LMX Labs product ecosystem — architecture and execution across two live platforms, and the engineering team building them.',
     work: [

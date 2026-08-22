@@ -158,7 +158,10 @@ const person: Node = {
     { '@type': 'CollegeOrUniversity', name: 'Vellore Institute of Technology' },
     { '@type': 'CollegeOrUniversity', name: 'Indian Institute of Technology Ropar' },
   ],
-  worksFor: { '@type': 'Organization', name: 'LMX Labs' },
+  /* No `worksFor`. Both engagements finished in July 2026, and
+     schema.org `worksFor` asserts a current one. An out-of-date
+     employer is a false statement about the entity, and omitting
+     the property says less but says nothing untrue. */
   knowsAbout: [
     'Full stack engineering', 'Machine learning', 'Retrieval-augmented generation',
     'Multi-tenant SaaS architecture', 'PostgreSQL', 'React', 'TypeScript', 'Python',
@@ -199,10 +202,10 @@ const credentials: Node[] = CERTIFICATIONS.map((c) => ({
 const personFull: Node = {
   ...person,
   description:
-    `${NAME} is a full stack and AI systems engineer. He leads engineering at ` +
-    'LMX Labs across two live platforms, reads a B.Tech in Computer Engineering ' +
-    'at Vellore Institute of Technology, and holds a Major Degree in Artificial ' +
-    'Intelligence from IIT Ropar.',
+    `${NAME} is a full stack and AI systems engineer. He led engineering at ` +
+    'LMX Labs, shipping two platforms that run in production, reads a B.Tech in ' +
+    'Computer Engineering at Vellore Institute of Technology, and holds a Major ' +
+    'Degree in Artificial Intelligence from IIT Ropar.',
   hasCredential: credentials,
 };
 
@@ -290,10 +293,10 @@ export const homeSeo = (): RouteSeo => ({
   url: '/',
   title: `${NAME} — ${ROLE}`,
   description:
-    'Full stack and AI systems engineer — multi-tenant SaaS, semantic retrieval, production ML. Engineering lead at LMX Labs. VIT Vellore, AI major at IIT Ropar.',
+    'Full stack and AI systems engineer — multi-tenant SaaS, semantic retrieval, production ML. Two platforms shipped live. VIT Vellore, AI major at IIT Ropar.',
   h1: NAME,
   body: [
-    `${NAME} is a full stack and AI systems engineer. He leads engineering at LMX Labs across two live platforms, reads a B.Tech at Vellore Institute of Technology and holds a Major Degree in Artificial Intelligence from IIT Ropar, and ships production systems — multi-tenant SaaS, semantic retrieval, and machine learning services that run.`,
+    `${NAME} is a full stack and AI systems engineer. He led engineering at LMX Labs across two live platforms, reads a B.Tech at Vellore Institute of Technology and holds a Major Degree in Artificial Intelligence from IIT Ropar, and ships production systems — multi-tenant SaaS, semantic retrieval, and machine learning services that run.`,
     `Selected work: ${PROJECTS.slice(0, 6).map((p) => p.title).join(', ')}.`,
   ],
   schema: [

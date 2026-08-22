@@ -31,7 +31,8 @@ export function GET() {
 
   const body =
     `# ${NAME}\n\n` +
-    `> Full stack and AI systems engineer. Engineering lead at LMX Labs, reading a ` +
+    `> Full stack and AI systems engineer. Led engineering at LMX Labs across two ` +
+    `platforms live in production, reading a ` +
     `B.Tech at Vellore Institute of Technology, holding a Major Degree in ` +
     `Artificial Intelligence from IIT Ropar. Builds multi-tenant SaaS platforms, ` +
     `semantic retrieval pipelines and production machine learning services.\n\n` +
