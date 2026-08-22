@@ -618,7 +618,7 @@ function ProjectFrame({
         <MotionPicture
           sizes="(min-width: 1024px) 55vw, 100vw"
           src={project.cover}
-          alt=""
+          alt={`${project.title} — ${project.category}`}
           loading="lazy"
           decoding="async"
           style={{ scale: imgScale }}

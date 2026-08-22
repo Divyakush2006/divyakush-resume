@@ -77,7 +77,7 @@ export function WorksListMobile() {
                 <figure className="mt-5 overflow-hidden rounded-panel border border-black/12">
                   <Picture
                     src={project.cover}
-                    alt=""
+                    alt={`${project.title} — ${project.category}`}
                     loading="lazy"
                     decoding="async"
                     sizes="100vw"

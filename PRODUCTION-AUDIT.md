@@ -988,3 +988,46 @@ for `&` in an HTML attribute, and the DOM's own `href` contains a plain
 is `next/font`, which would self-host Inter and JetBrains Mono and
 remove the external stylesheet — and the URL — entirely. That remains
 the open typography decision.
+
+# SEO Audit — the alt-text finding — 22 August 2026
+
+An SEOptimer crawl graded the site B+ overall: On-Page A, Performance
+A+, Usability A-, GEO B+, Links D. Fifteen recommendations. Most are
+off-site or decline-worthy; one was a real defect nobody had counted.
+
+**39 of the 40 images on the home page had an empty alt attribute.**
+`Picture.tsx` makes `alt` a required prop so it can never go missing by
+accident, and the comment there was satisfied with that — but requiring
+an answer is not the same as getting a right one, and almost every call
+site had answered `""`. Six were content: the hero portrait, the deck
+and mobile-list project covers, the certificate thumbnails, the project
+page hero, and the next-project cover. Real alt out of total images per
+route went 1/40 to 24/40 on `/`, 3/5 to 5/5 on a project page, and 2/39
+to 25/39 on an insight. What is still empty sits inside something
+already `aria-hidden` — the carousel mirrors, the peeked neighbour
+slides, the contact avatars.
+
+**The "duplicate H1" finding is a false positive**, and worth writing
+down so nobody "fixes" it. The raw HTML carries exactly one `<h1>`,
+inside `<noscript>`; the rendered DOM carries exactly one, the hero.
+SEOptimer renders the page *and* parses `<noscript>`, so it counts
+both. No real client ever sees two: a browser with JavaScript treats
+`<noscript>` content as inert text, and one without it renders only the
+prose. Demoting the noscript heading to `<h2>` would satisfy the tool
+and cost the non-rendering crawlers — several LLM crawlers among them —
+the only `<h1>` they can see. Left alone deliberately.
+
+**Declined, with reasons:** LocalBusiness schema (this is a person, not
+a business, and inventing the type is the manual-action risk the
+playbook exists to avoid), a Facebook Pixel (no ad campaigns, and it is
+a tracker), business address and phone (a UI change and a privacy
+decision), and keyword consistency — the tool's top page keywords are
+"view" (22) and "read" (17), which are the repeated "View certificate"
+and "Read the story" affordance labels, not subjects. Distributing them
+into titles and headings is keyword stuffing by another name.
+
+**Left open, and not fixable in this repository:** the Links grade of D
+— 1 backlink from 1 referring domain, domain strength 20 — which is the
+highest-priority item on the report and is entirely off-site. SPF and
+DMARC records are DNS. The GEO "rendered content 806%" finding is the
+client-rendering trade-off already argued in this document.

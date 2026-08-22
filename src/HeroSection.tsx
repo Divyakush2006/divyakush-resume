@@ -514,7 +514,7 @@ export function HeroSection() {
                 <Picture
                   sizes={HERO_SIZES}
                   src={heroPhoto}
-                  alt=""
+                  alt="Divyakush Punjabi"
                   width={1024}
                   height={1024}
                   decoding="async"

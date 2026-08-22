@@ -64,9 +64,20 @@ import { IMAGES } from '../lib/image-fallbacks.generated';
    missing rendition should never cost a browser the image it can
    already display.
 
-   `alt` is required rather than optional. Roughly half these images
-   are decorative and correctly pass `alt=""`, but that has to be a
-   decision someone made, not an attribute that went missing.
+   `alt` is required rather than optional, so passing nothing is not
+   something that can happen by accident — but requiring it is not the
+   same as getting it right, and for a while almost every call site
+   answered `""`. An SEO crawl put a number on it: 39 of the 40 images
+   on the home page had an empty alt, including the hero portrait,
+   every project cover and every certificate scan. Those are content,
+   not decoration, and an empty alt tells a screen reader and an image
+   crawler alike that there is nothing there.
+
+   What is left empty now is empty on purpose, and each one sits inside
+   something already marked `aria-hidden`: the carousel's mirrored side
+   panels (a reflection of the photograph beside them), its peeked
+   neighbour slides, and the contact avatars. An image that assistive
+   technology is told to ignore should not also carry a description.
    ───────────────────────────────────────────────────────────────── */
 
 /** Everything known about one image, or null if it is not in the set. */

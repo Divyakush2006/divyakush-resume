@@ -185,7 +185,7 @@ function CertCard({ cert, index, reduced, onOpen }: CardProps) {
             <Picture
               sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw"
               src={cert.image}
-              alt=""
+              alt={`${cert.title} certificate issued by ${cert.issuer}`}
               loading="lazy"
               decoding="async"
               width={1414}

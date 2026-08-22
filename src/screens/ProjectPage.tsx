@@ -292,7 +292,7 @@ function Hero({ project }: { project: Project }) {
         <Picture
           sizes="100vw"
           src={project.cover}
-          alt=""
+          alt={`${project.title} — ${project.category}`}
           className="h-full w-full object-cover object-center"
           decoding="async"
         />
@@ -928,7 +928,7 @@ function Pager({ slug }: { slug: string }) {
             <Picture
               sizes="100vw"
               src={next.cover}
-              alt=""
+              alt={`${next.title} — ${next.category}`}
               loading="lazy"
               decoding="async"
               className="h-full w-full object-cover object-center opacity-25 transition-all duration-[1400ms] ease-out group-hover:scale-105 group-hover:opacity-40"
