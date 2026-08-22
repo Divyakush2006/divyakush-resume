@@ -74,6 +74,12 @@ const REQUIRED = {
   WebPage: ['url'],
   ProfilePage: ['url'],
   SoftwareSourceCode: ['name'],
+  /* `name` is all schema.org demands. Google additionally wants one of
+     offers / aggregateRating / review before it will draw a rich
+     result, and this site has no price and no rating that exists, so
+     it publishes neither and gets no stars. That is the correct
+     outcome, not a gap to fill. */
+  SoftwareApplication: ['name', 'url'],
 };
 
 const isAbsolute = (v) => typeof v === 'string' && /^https?:\/\//.test(v);

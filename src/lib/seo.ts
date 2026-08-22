@@ -241,6 +241,49 @@ const webPage = (url: string, name: string, description: string, extra: Node = {
   ...extra,
 });
 
+/* ── The products ─────────────────────────────────────────────────
+   The four platforms the Ground Truth for this site names as its own
+   products, as SoftwareApplication, attached to the home page.
+
+   Every one is rendered on the home page and has its own route, so
+   this marks up what a reader can already see and can click through
+   to. The slugs were checked against the export rather than assumed —
+   a `url` on a route that does not exist is a broken claim, not a
+   missing feature.
+
+   `author` is a reference to the Person node rather than a repeated
+   copy of it, which is what makes the graph one graph.
+
+   Worth knowing what this does and does not buy: SoftwareApplication
+   is only eligible for a rich result when it carries `offers`,
+   `aggregateRating` or `review`. None of these have a price or a
+   rating that exists, so none is invented, and none of these will draw
+   a star rating in a search result. What it does do is state, in a
+   form a knowledge graph can read, that this person authored these
+   named applications — which is entity evidence, and the thing this
+   site is actually short of. */
+const PRODUCT_SLUGS = ['saturdays', 'dineguru', 'governai-research-atlas', 'governai-studio'];
+
+const products: Node[] = PRODUCT_SLUGS.flatMap((slug) => {
+  const p = PROJECTS.find((x) => x.slug === slug);
+  if (!p) return [];
+  const live = (p.links ?? []).find((l) => l.kind === 'live')?.href;
+  return [
+    {
+      '@type': 'SoftwareApplication',
+      '@id': `${ORIGIN}/projects/${p.slug}#app`,
+      name: p.title,
+      url: `${ORIGIN}/projects/${p.slug}`,
+      applicationCategory: 'WebApplication',
+      operatingSystem: 'Web',
+      description: clamp(p.summary || p.lede),
+      author: { '@id': `${ORIGIN}/#person` },
+      ...(p.stack?.length ? { keywords: p.stack.join(', ') } : {}),
+      ...(live ? { sameAs: live } : {}),
+    },
+  ];
+});
+
 /* ── The routes ───────────────────────────────────────────────── */
 
 export const homeSeo = (): RouteSeo => ({
@@ -261,6 +304,7 @@ export const homeSeo = (): RouteSeo => ({
       mainEntity: { '@id': `${ORIGIN}/#person` },
       primaryImageOfPage: { '@id': `${ORIGIN}/#logo` },
     }),
+    ...products,
   ],
 });
 
