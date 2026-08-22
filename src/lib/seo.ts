@@ -51,14 +51,26 @@ export const ROLE = 'Full Stack & AI Systems Engineer';
 /* Every identity URL under the author's control. Repeated byte for
    byte here, in the JSON-LD and on the profiles themselves — entity
    resolution is literally string matching, so "www." and a trailing
-   slash are not cosmetic. */
+   slash are not cosmetic.
+
+   Profiles only. Two entries were removed because they were not
+   profiles at all, they were the two properties this origin replaced:
+
+     divyakush.is-a.dev                        301 → www.divyakush.com
+     divyakush2006.github.io/divyakush-resume  a "moved to" stub whose
+                                               canonical already points
+                                               here
+
+   `sameAs` means "the same entity, described elsewhere". Naming a
+   redirect back to yourself asserts nothing, and naming a retired
+   property keeps it alive in the graph while the migration is trying
+   to retire it. Both were checked over HTTP before removal, not
+   assumed. */
 export const SAME_AS = [
   'https://github.com/Divyakush2006',
   'https://www.linkedin.com/in/divyakush-punjabi',
   'https://dev.to/divyakush',
   'https://about.me/divyakush',
-  'https://divyakush.is-a.dev',
-  'https://divyakush2006.github.io/divyakush-resume/',
 ];
 
 /** Trim to a length a search result will actually print. */
