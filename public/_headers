@@ -126,6 +126,31 @@
 #   Nothing here grants Google a frame, a font or a style. If a tag ever
 #   needs one, it should be argued for rather than added.
 #
+#   ── Cloudflare Web Analytics ────────────────────────────────────
+#   static.cloudflareinsights.com in script-src, cloudflareinsights.com
+#   in connect-src.
+#
+#   This one is not requested by anything in this repository. Pages
+#   injects the beacon into every HTML response itself when Web
+#   Analytics is on for the project, so it appears in production and
+#   never locally — which is exactly how it was found: the first live
+#   deploy logged
+#
+#     Loading the script 'https://static.cloudflareinsights.com/
+#     beacon.min.js/...' violates the following Content-Security-Policy
+#     directive: "script-src 'self' 'unsafe-inline' ..."
+#
+#   on every page load, and the beacon never ran.
+#
+#   Two ways to make that console line go away: allow the host, or turn
+#   Web Analytics off in the Cloudflare dashboard. The second is the
+#   cleaner one on this site — GA4 already measures it, so the beacon
+#   is a second analytics vendor collecting the same page views — and
+#   the host is allowed here anyway, because the failure mode of the
+#   other order is worse: a CSP that blocks a script the host injects
+#   is a policy arguing with its own platform on every request, and
+#   nobody reading the console can tell it apart from a real attack.
+#
 #   frame-ancestors 'none'  Nothing may frame this site. Replaces the
 #                           older X-Frame-Options, which is kept below
 #                           only for browsers that predate CSP Level 2.
@@ -138,7 +163,7 @@
 #                           here needs them and they are a classic
 #                           injection surface.
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com https://*.g.doubleclick.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.prod.website-files.com; connect-src 'self' https://formsubmit.co https://*.google-analytics.com https://*.analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; object-src 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com https://*.g.doubleclick.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.prod.website-files.com; connect-src 'self' https://cloudflareinsights.com https://formsubmit.co https://*.google-analytics.com https://*.analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; object-src 'none'; upgrade-insecure-requests
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin

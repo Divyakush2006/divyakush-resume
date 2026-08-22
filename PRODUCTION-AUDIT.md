@@ -886,3 +886,105 @@ not show a hundred files as modified.
   wearing a performance change's clothes.
 - **motion 11 to 13** (decision). Still blocked on clipping the deck's
   window maths to the range 0 to 1.
+
+---
+
+# Three post-deploy fixes — 22 August 2026
+
+The site went live on Cloudflare Pages. Verified against production,
+not localhost: twenty-three routes answering 200 with distinct titles,
+a real 404, and every security header from `public/_headers` applied by
+Cloudflare. The distinct titles are the proof that matters — the site
+this replaced served `/* /index.html 200`, so every URL reported the
+home page's title and canonical. That is fixed in production now.
+
+Three things surfaced afterwards.
+
+## 1. The document title never reverted to the home page's
+
+Closing a story left the tab named after the story. Measured on the
+export and again on production:
+
+    /            -> /projects/x   title updates          ok
+    /projects/a  -> /projects/b   title updates          ok
+    /insights/x  -> /             title stays on the story
+    /projects/x  -> /  (Back)     title goes EMPTY
+
+In the same navigations the description, `og:title` and canonical all
+reverted correctly, so this was not metadata failing to resolve. It was
+the `<title>` element specifically, and only for the root route.
+
+Four candidate causes were tested and each ruled out by measurement:
+the explicit `<head>` element in the root layout, the layout-level
+`title`, a static `metadata` export versus `generateMetadata` on the
+home page, and React's `<title>` hoisting. None changed the result.
+
+`TitleManager` in `src/App.tsx` now sets the title on pathname change,
+reading `titleFor()` — which resolves through `homeSeo`/`projectSeo`/
+`insightSeo`, the same table `app/` uses to write the served HTML. One
+source of truth, so a route cannot end up with two answers. It is a
+no-op on every navigation Next already gets right, including first
+paint of every URL.
+
+`INSIGHT_PREFIX` moved into `src/lib/seo.ts` as part of this. It was a
+local constant in `InsightsCarousel.tsx` whose own comment warned
+against a second copy, and the App shell needed it too.
+
+## 2. The insights dot rail wrapped on every phone
+
+Twelve dashes, and one fell onto a second line at every width below
+414px. Measured: 334px of items against 270px of content width at
+320px, 310px at 360px, 340px at 390px.
+
+`flex-wrap` is gone, so it has to fit. The arithmetic is the whole
+problem: twelve targets at the 24px minimum need 288px, and a 320px
+phone does not have that after gutters.
+
+The first attempt shrank the targets to 20x40 and the audits caught it
+immediately — two MED findings, on `/` and every insight route, where
+there had been none. So the targets stay at 24px and the rail is
+allowed to run *into* the gutter instead: 302px of items centred in a
+270px container extends 16px each side, the gutter is 25px, and
+`documentElement.scrollWidth` is unchanged from 320px up. Checked
+rather than assumed, because a nowrap row is exactly how a page
+acquires a horizontal scrollbar.
+
+Below `sm` the button padding is 7px and the active mark 24px; above
+it, the original 8px and 32px, so nothing on a desktop moved. The pixel
+harness confirms it: `home-phone.png` is 40px shorter than the baseline
+— one `h-10` row, the wrapped one — and `home-desktop.png` is
+identical.
+
+## 3. Two console errors, both from Cloudflare, neither from this repo
+
+Zero console errors locally, two in production. Both are injected by
+the platform after the export leaves the build.
+
+**The Web Analytics beacon was blocked by our own CSP.** Pages injects
+`static.cloudflareinsights.com/beacon.min.js` into every HTML response
+when Web Analytics is on, and `script-src` had never heard of it. The
+host is allowed now. The cleaner fix is arguably to turn Web Analytics
+off — GA4 already measures this site, so the beacon is a second vendor
+collecting the same page views — but a CSP that blocks a script its own
+host injects argues with the platform on every request, and nobody
+reading a console can tell that apart from a real attack.
+
+**Early Hints preloads a URL that does not exist.** Cloudflare scrapes
+the HTML to build `103 Early Hints` and does not decode HTML entities,
+so it emits:
+
+    Link: <https://fonts.googleapis.com/css2?family=Inter:...
+           &amp;family=JetBrains+Mono:...&amp;display=swap>; rel="preload"
+
+with the `&amp;` literal. That is a different URL from the stylesheet
+the page actually loads, so the browser preloads it, never uses it, and
+logs `preloaded using link preload but not used within a few seconds` —
+once per hint.
+
+Nothing in this repository is wrong: `&amp;` is the correct escaping
+for `&` in an HTML attribute, and the DOM's own `href` contains a plain
+`&`. This is a Cloudflare defect and the fix is theirs or a toggle:
+**Speed → Optimization → Early Hints, off**. The code-level alternative
+is `next/font`, which would self-host Inter and JetBrains Mono and
+remove the external stylesheet — and the URL — entirely. That remains
+the open typography decision.

@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, MapPin, Pause, Play } from 'lucide-react';
 import { SectionHeader } from './primitives';
 import { InsightStory } from './InsightStory';
 import { INSIGHTS } from '../lib/insights';
+import { INSIGHT_PREFIX } from '../lib/seo';
 import { Picture } from './Picture';
 import { useMediaQuery } from '../lib/useMediaQuery';
 
@@ -126,10 +127,6 @@ function offset(i: number, active: number, count: number) {
   if (d < -half) d += count;
   return d;
 }
-
-/** The modal route's prefix. One string, so the parser below and
-    every push above cannot drift apart. */
-const INSIGHT_PREFIX = '/insights/';
 
 export function InsightsCarousel() {
   const count = INSIGHTS.length;
@@ -699,8 +696,36 @@ export function InsightsCarousel() {
 
           {/* Dot rail. Each dot is a real button with a 40px tall hit
               area around a 3px mark — the reference's bare dots are
-              below every minimum target size there is. */}
-          <ul className="flex flex-wrap items-center justify-center gap-x-0.5 gap-y-0 sm:gap-x-1.5">
+              below every minimum target size there is.
+
+              ── Why it never wraps, and what that costs ────────────
+              `flex-wrap` used to be here, and with twelve moments the
+              rail wrapped a single dash onto a second line on every
+              phone: the items measured 334px against 270px of content
+              width at 320px, 310px at 360px and 340px at 390px. One
+              orphaned dash under eleven others reads as a mistake
+              rather than as a rail.
+
+              It cannot wrap now — `flex-nowrap` — so it has to fit,
+              and twelve targets at the 24px minimum need 288px, which
+              a 320px phone does not have after gutters. Rather than
+              shrink the targets (measured: 20x40, and the audits
+              correctly flagged it on two routes), the rail keeps 24px
+              and is allowed to run *into* the gutter on the narrowest
+              phones: 302px of items centred in a 270px container
+              extends 16px each side, and the gutter is 25px, so it
+              stays inside the viewport. `documentElement.scrollWidth`
+              is unchanged at every width from 320px up — checked, not
+              assumed, because a nowrap row is exactly how a page
+              acquires a horizontal scrollbar.
+
+              Below `sm` the padding is 7px and the active mark 24px,
+              which is what brings 334px down to 302px. Above it, the
+              original 8px and 32px.
+
+              If a thirteenth moment is added, re-measure: this fits
+              twelve at 320px with 18px to spare, not sixty. */}
+          <ul className="flex flex-nowrap items-center justify-center gap-x-0 sm:gap-x-1.5">
             {INSIGHTS.map((item, i) => {
               const on = i === active;
               return (
@@ -710,11 +735,13 @@ export function InsightsCarousel() {
                     onClick={() => setActive(i)}
                     aria-label={`Go to ${item.title}`}
                     aria-current={on ? 'true' : undefined}
-                    className="group grid h-10 place-items-center px-2"
+                    className="group grid h-10 shrink-0 place-items-center px-[7px] sm:px-2"
                   >
                     <span
                       className={`block h-[3px] rounded-full transition-all duration-300 ease-out ${
-                        on ? 'w-8 bg-ink' : 'w-2.5 bg-black/20 group-hover:w-4 group-hover:bg-black/45'
+                        on
+                          ? 'w-6 bg-ink sm:w-8'
+                          : 'w-2.5 bg-black/20 group-hover:w-4 group-hover:bg-black/45'
                       }`}
                     />
                   </button>

@@ -8,6 +8,7 @@ import { Footer } from './components/Footer';
 import { Home } from './screens/Home';
 import { ProjectPage } from './screens/ProjectPage';
 import { NotFound } from './screens/NotFound';
+import { INSIGHT_PREFIX, homeSeo, insightSeo, projectSeo } from './lib/seo';
 
 /* ─────────────────────────────────────────────────────────────────
    Routes.
@@ -129,6 +130,55 @@ function projectSlug(pathname: string): string | null {
   return slug.length && !slug.includes('/') ? slug : null;
 }
 
+/** What this URL's document says its title is, read from the same
+    table that wrote the served HTML — so the two cannot drift. */
+function titleFor(pathname: string): string | null {
+  if (pathname === '/') return homeSeo().title;
+  if (pathname.startsWith(INSIGHT_PREFIX)) {
+    const slug = pathname.slice(INSIGHT_PREFIX.length).replace(/\/+$/, '');
+    return insightSeo(slug)?.title ?? null;
+  }
+  const slug = projectSlug(pathname);
+  return slug ? (projectSeo(slug)?.title ?? null) : null;
+}
+
+/* ── The document title, on client-side navigation ────────────────
+   Next writes a correct <title> into all twenty-three documents at
+   build time, and updates it correctly when you navigate between two
+   dynamic routes. It does not update it when you navigate *to* `/`.
+
+   Measured, on the built export and again on production:
+
+     /            -> /projects/x   title updates          ok
+     /projects/a  -> /projects/b   title updates          ok
+     /insights/x  -> /             title stays on the story
+     /projects/x  -> /  (Back)     title goes EMPTY
+
+   In the same navigations the description, og:title and canonical all
+   revert correctly, so this is not metadata failing to resolve — it
+   is the <title> element specifically, and only for the root route.
+   Ruled out by testing each in turn: the explicit <head> in the root
+   layout, the layout-level `title`, and static `metadata` versus
+   `generateMetadata` on the home page. None of them was the cause.
+
+   Closing a story is the common path — `/insights/<slug>` back to `/`
+   is one Escape key — so the visible symptom was a reader closing a
+   story and leaving the tab named after it.
+
+   This sets the title from `titleFor`, which reads the same route
+   table `app/` uses, so there is one source of truth and a route that
+   changes its title cannot end up with two answers. It is a no-op on
+   every navigation Next already gets right, including the first paint
+   of every URL. */
+function TitleManager({ pathname }: { pathname: string }) {
+  useEffect(() => {
+    const title = titleFor(pathname);
+    if (title && document.title !== title) document.title = title;
+  }, [pathname]);
+
+  return null;
+}
+
 export function App() {
   /* `usePathname` is null only while the router is initialising, which
      cannot happen here — this tree is client-only and mounts after it. */
@@ -140,6 +190,7 @@ export function App() {
   return (
     <div className="clip-x bg-ink">
       <ScrollManager pathname={pathname} />
+      <TitleManager pathname={pathname} />
       <Nav />
 
       {isHome ? <Home /> : slug ? <ProjectPage slug={slug} /> : <NotFound />}

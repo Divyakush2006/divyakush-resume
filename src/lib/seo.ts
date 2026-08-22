@@ -39,6 +39,12 @@ import { CERTIFICATIONS } from './certifications';
 import { IMAGES } from './image-fallbacks.generated';
 
 export const ORIGIN = 'https://www.divyakush.com';
+
+/* The modal route's prefix. One string, read by the carousel that
+   pushes these URLs, by the App shell that decides which tree and
+   which title a path gets, and by insightSeo below — a second copy is
+   how a router and a <title> start disagreeing about what a URL is. */
+export const INSIGHT_PREFIX = '/insights/';
 export const NAME = 'Divyakush Punjabi';
 export const ROLE = 'Full Stack & AI Systems Engineer';
 
