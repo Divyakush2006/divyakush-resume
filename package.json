@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/images.mjs && tsc && next build && node scripts/post-build.mjs",
+    "build": "node scripts/content-dates.mjs && node scripts/images.mjs && tsc && next build && node scripts/post-build.mjs",
     "serve": "node scripts/serve-dist.mjs",
     "images": "node scripts/images.mjs",
     "typecheck": "tsc",
@@ -25,7 +25,8 @@
     "audit:navigation": "node scripts/audit-navigation.mjs",
     "snapshot": "node scripts/snapshot.mjs",
     "snapshot:diff": "node scripts/snapshot-diff.mjs",
-    "audit:schema": "node scripts/audit-schema.mjs"
+    "audit:schema": "node scripts/audit-schema.mjs",
+    "content:dates": "node scripts/content-dates.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",

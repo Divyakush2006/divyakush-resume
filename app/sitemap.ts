@@ -1,4 +1,5 @@
-import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
 import type { MetadataRoute } from 'next';
 
 import { ORIGIN, allRoutes } from '../src/lib/seo';
@@ -31,47 +32,53 @@ import { ORIGIN, allRoutes } from '../src/lib/seo';
    when it is consistent and demonstrably accurate, and ignored when it
    is not.
 
-   So it comes from version control instead. Each route's content lives
-   in exactly one data file, and the last commit that touched that file
-   is the honest answer for every route built from it. Redeploying
-   without changing content now leaves the dates alone, which is the
-   entire point.
+   The first attempt at that asked git: `git log -1 -- <file>`, per
+   content file. Correct locally, and wrong where it ships. Cloudflare
+   Pages clones with `--depth=1`, and a one-commit clone reports that
+   commit for every path — so every deploy stamped all twenty-three
+   URLs with the deploy's own timestamp. It worked on the machine it
+   was written on and degraded silently in production, which is the
+   worst shape a bug can have.
 
-   Falls back to the build date if git is unavailable — a tarball, a
-   `npm pack`, a CI runner without the history. A slightly stale date
-   is worth more than a build that fails for a hint.
+   So the build no longer derives the answer, it reads one.
+   `scripts/content-dates.mjs` hashes each content file and holds the
+   date steady until the hash moves; `seo/content-dates.json` is
+   committed, so every environment reads the same answer and a date
+   only changes in a diff someone can see.
+
+   Falls back to the build date if that file is missing — a tarball, a
+   fresh checkout that has not run the build step. A slightly stale
+   date is worth more than a build that fails for a hint.
    ───────────────────────────────────────────────────────────────── */
 
 export const dynamic = 'force-static';
 
 const BUILD_DATE = new Date();
 
-/** When `file` was last committed, or null if git cannot say. */
-function lastCommit(file: string): Date | null {
+/** The recorded dates, read once per build. */
+const RECORDED: Record<string, Date> = (() => {
   try {
-    const out = execFileSync('git', ['log', '-1', '--format=%cI', '--', file], {
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore'],
-      cwd: process.cwd(),
-    }).trim();
-    if (!out) return null;
-    const d = new Date(out);
-    return Number.isNaN(d.getTime()) ? null : d;
+    const raw = fs.readFileSync(path.join(process.cwd(), 'seo', 'content-dates.json'), 'utf8');
+    const out: Record<string, Date> = {};
+    for (const [key, entry] of Object.entries(JSON.parse(raw) as Record<string, { date?: string }>)) {
+      const d = new Date(entry?.date ?? '');
+      if (!Number.isNaN(d.getTime())) out[key] = d;
+    }
+    return out;
   } catch {
-    return null;
+    return {};
   }
-}
+})();
 
-/* Resolved once per build, not once per URL: twenty-three `git log`
-   processes to answer three questions is twenty spawns of pure waste. */
 const SOURCE = {
-  projects: lastCommit('src/lib/projects.ts') ?? BUILD_DATE,
-  insights: lastCommit('src/lib/insights.ts') ?? BUILD_DATE,
+  projects: RECORDED.projects ?? BUILD_DATE,
+  insights: RECORDED.insights ?? BUILD_DATE,
+  certifications: RECORDED.certifications ?? BUILD_DATE,
 } as const;
 
-/* The home page renders everything, so it is as new as the newest
+/* The home page renders all of it, so it is as new as the newest
    thing on it. */
-const HOME = new Date(Math.max(SOURCE.projects.getTime(), SOURCE.insights.getTime()));
+const HOME = new Date(Math.max(...Object.values(SOURCE).map((d) => d.getTime())));
 
 function lastModified(url: string): Date {
   if (url.startsWith('/projects/')) return SOURCE.projects;

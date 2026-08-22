@@ -1,0 +1,17 @@
+{
+  "projects": {
+    "hash": "886eff6ff4ae4c45",
+    "date": "2026-08-22T00:03:32.000Z",
+    "file": "src/lib/projects.ts"
+  },
+  "insights": {
+    "hash": "dc09b0ae5073998b",
+    "date": "2026-08-22T00:03:32.000Z",
+    "file": "src/lib/insights.ts"
+  },
+  "certifications": {
+    "hash": "f773af5ea9e6f597",
+    "date": "2026-08-22T00:03:32.000Z",
+    "file": "src/lib/certifications.ts"
+  }
+}
