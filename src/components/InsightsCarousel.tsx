@@ -490,7 +490,28 @@ export function InsightsCarousel() {
                 <Picture
                   sizes="(min-width: 1024px) 60vw, 92vw"
                   src={item.image}
-                  alt={on ? `${item.title}${item.location ? `, ${item.location}` : ''}` : ''}
+                  /* Described always, not only while this card is the
+                     active one.
+
+                     It used to read `on ? … : ''`, which left eleven of
+                     the twelve photographs with an empty alt at any
+                     moment — and a crawler samples the page once, so
+                     eleven real photographs of real events went into
+                     the index undescribed. A third-party audit counted
+                     them and reported the site as having images without
+                     alt text.
+
+                     Nothing is lost by describing them. The slide
+                     container above already carries
+                     `aria-hidden={on ? undefined : true}`, so an
+                     inactive card and everything inside it is out of
+                     the accessibility tree regardless of what this
+                     attribute says — which is what stops a screen
+                     reader announcing twelve images in a row, and it
+                     was doing that job on its own. This was a second
+                     mechanism for the same goal that only ever had the
+                     side effect. */
+                  alt={`${item.title}${item.location ? `, ${item.location}` : ''}`}
                   loading={Math.abs(d) <= 1 ? 'eager' : 'lazy'}
                   decoding="async"
                   draggable={false}

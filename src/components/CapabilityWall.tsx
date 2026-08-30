@@ -81,11 +81,28 @@ const ROWS: string[][] = Array.from({ length: ROW_COUNT }, () => []);
 CAPABILITIES.flatMap((cap) => cap.skills).forEach((name, i) => ROWS[i % ROW_COUNT].push(name));
 
 /* One named animation per row, carrying both speed and direction.
-   They cannot be composed out of `animate-marquee` plus an
-   `[animation-duration:…]` / `[animation-direction:…]` utility: the
+   They cannot be composed out of `animate-marquee` plus arbitrary
+   animation-duration and animation-direction utilities: the
    `animate-*` class sets the `animation` shorthand, which resets both
    of those regardless of what else is applied. See the keyframes note
-   in tailwind.config.js. */
+   in tailwind.config.js.
+
+   ── Why those two utilities are named in prose and not in brackets ──
+   They used to be written here in Tailwind's arbitrary-value syntax,
+   with an ellipsis standing in for the value. Tailwind's scanner does
+   not parse JavaScript — it looks for class-name-shaped strings in the
+   raw file — so it found both of them *inside this comment* and
+   generated real rules for them:
+
+       .\[animation-duration\:…\]  { animation-duration: … }
+       .\[animation-direction\:…\] { animation-direction: … }
+
+   Dead CSS, with a literal `…` where a time and a keyword belong, in
+   every stylesheet the site shipped. The W3C CSS validator reported
+   both as errors and it was right; they were two of the four it found.
+
+   A comment cannot mention a bracket utility without creating it, so
+   this one describes them instead. */
 const ROW_ANIMATION = ['motion-safe:animate-wall-a', 'motion-safe:animate-wall-b'];
 
 /* Read off the old portfolio's own wall. `-0.05em` is its -3px

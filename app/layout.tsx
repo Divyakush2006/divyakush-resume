@@ -4,6 +4,7 @@ import Script from 'next/script';
 import '../src/index.css';
 import { AppShell } from './_components/AppShell';
 import { NAME, ORIGIN, ROLE, SAME_AS, homeSeo } from '../src/lib/seo';
+import { FontPreload } from './_seo/Document';
 
 /* ─────────────────────────────────────────────────────────────────
    The document.
@@ -41,6 +42,63 @@ export const metadata: Metadata = {
   /* No `alternates` here. Every route states its own canonical, and a
      layout-level default would silently apply to any route that forgot
      to — which is the failure this whole layer exists to prevent. */
+
+  /* ── The robots directive ────────────────────────────────────────
+     A third-party audit reported "Robots Meta Tag: Missing", and it
+     was right that the tag was absent. Absent is not the same as
+     wrong — the default for a page with no robots meta *is*
+     `index, follow`, and `public/robots.txt` already welcomes every
+     crawler by name — so nothing was being blocked and adding
+     `index, follow` alone would change precisely nothing.
+
+     It is here for the other three directives, which have no defaults
+     worth having:
+
+       max-image-preview:large   Lets Google use a *large* thumbnail in
+                                 a result and in Discover. Without it
+                                 the preview is capped at a
+                                 thumbnail-sized image. This site is a
+                                 portfolio whose evidence is
+                                 photographic — twelve event
+                                 photographs, eighteen certificate
+                                 scans, ten project covers — and this
+                                 one token decides how much of that a
+                                 person sees before deciding to click.
+
+       max-snippet:-1            No cap on the text snippet length.
+                                 The default lets Google choose, and
+                                 it chooses short.
+
+       max-video-preview:-1      No cap on video previews. The project
+                                 pages carry walkthrough films.
+
+     Set at the layout so it applies to all twenty-three documents.
+     Unlike `alternates` above, there is no per-route value here that
+     could be wrong: every page on this site should be indexed, and a
+     route that ever should not can override it locally.
+
+     The three directives are set at the top level *and* under
+     `googleBot`. Next emits the top-level ones as <meta name="robots">
+     and the nested ones as <meta name="googlebot">, and the first
+     version of this only set them under `googleBot` — which handed the
+     preview rules to Google and to nobody else. Bing reads
+     `max-snippet` and `max-image-preview` from the generic `robots`
+     tag, so half the audience was getting defaults. Both tags now say
+     the same thing. */
+  robots: {
+    index: true,
+    follow: true,
+    'max-image-preview': 'large',
+    'max-snippet': -1,
+    'max-video-preview': -1,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
   icons: { icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }] },
   openGraph: {
     type: 'website',
@@ -86,26 +144,46 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
-        {/* Font hosts. Google serves Inter and JetBrains Mono; the
-            Webflow CDN serves the two display faces declared in
-            src/index.css. Preconnecting removes a round trip from the
-            hero's first paint, which is the LCP element.
+        {/* ── Fonts ──────────────────────────────────────────────
+            Inter and JetBrains Mono are self-hosted from /fonts and
+            declared in src/index.css. What used to be here was a
+            render-blocking <link rel="stylesheet"> to
+            fonts.googleapis.com, and removing it is the single largest
+            change on this page: nothing painted until that stylesheet
+            had been fetched from one third-party host and parsed to
+            discover font URLs on a second one. Two handshakes and four
+            serialised round trips in front of the first character.
+            See the long note in src/index.css.
 
-            These are written here rather than through next/font on
-            purpose. next/font would self-host and hash the files,
-            which is better — and it would also change which bytes the
-            browser gets, when it gets them, and how the fallback
-            metrics are computed. That is a typography change wearing a
-            performance change's clothes, and it does not belong in the
-            same commit as a framework port. It is written up in
-            PRODUCTION-AUDIT.md as the next thing to do here. */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+            Both faces are preloaded rather than merely declared. A
+            @font-face URL is not discovered until the CSS that
+            references it has been parsed *and* the browser has found a
+            character that needs it, which puts the fetch late in a
+            cascade it does not have to be in. These two are used above
+            the fold on every route, so they are asked for immediately.
+            Only the `latin` subsets — latin-ext stays lazy, which is
+            the point of declaring it separately.
+
+            `crossOrigin` is required even for a same-origin font:
+            fonts are always fetched in CORS mode, and a preload whose
+            mode does not match the eventual request is a preload the
+            browser discards and warns about, having downloaded the
+            file twice.
+
+            Emitted through <FontPreload /> rather than written as
+            <link> tags here, for the same reason HeroPreload exists:
+            React hoists a rendered <link rel="preload"> into <head>
+            as authored *and* registers it as a resource it emits
+            itself, so both faces appeared twice in every document.
+            The ReactDOM.preload API deduplicates. */}
+        <FontPreload />
+
+        {/* The two display faces are still hotlinked from a Webflow
+            CDN — see src/index.css for why they have not moved. They
+            load lazily behind `font-display: swap`, so this preconnect
+            is worth keeping: it overlaps the handshake with parsing
+            rather than paying for it when the face is first needed. */}
         <link rel="preconnect" href="https://cdn.prod.website-files.com" crossOrigin="" />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap"
-        />
 
         {/* The identity graph's `sameAs`, as link relations. The
             JSON-LD says the same thing; a crawler that reads one and

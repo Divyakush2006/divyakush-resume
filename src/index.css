@@ -4,12 +4,96 @@
 
 /* ─────────────────────────────────────────────────────────────────
    FONTS
-   `Tr 3 A` and `PP Neue Montreal` are hotlinked from a third-party
-   Webflow CDN. They are kept for visual continuity but every stack
-   falls back to Inter → system-ui, so a CDN outage degrades the type
-   rather than breaking the layout. font-display:swap prevents an
-   invisible-text flash blocking first paint.
+
+   ── Inter and JetBrains Mono are self-hosted ──────────────────────
+   They used to arrive through a stylesheet link to
+   `fonts.googleapis.com` in app/layout.tsx. That one tag was the most
+   expensive thing on the site, and not because of its own size:
+
+     · A cross-origin <link rel="stylesheet"> is **render-blocking**.
+       Nothing paints until it has been fetched and parsed.
+     · The CSS does not contain the fonts — it contains *more URLs*, on
+       a second host. So the critical path was: connect to
+       googleapis, fetch CSS, parse it, discover gstatic, connect to
+       gstatic, fetch the faces. Two TLS handshakes and four round
+       trips, serialised, before a character could be drawn.
+
+   On the throttled mobile profile `npm run audit:perf` uses — 4x CPU,
+   Fast 3G, 150ms latency — the home page measured FCP 7988ms and
+   LCP 9844ms against a 2500ms budget. Preconnect hints were already
+   in place and do not fix this; they remove a handshake from a chain
+   that should not exist.
+
+   Both families are variable fonts, which is what makes the fix
+   small: every weight Google was serving as a separate request lives
+   in one file per subset. Five weights of Inter and three of
+   JetBrains Mono, previously eight URLs on a third-party origin, are
+   now two files on this one — fetched from a connection the browser
+   has already opened for the document, with no stylesheet in front of
+   them.
+
+   `latin-ext` is declared and almost never fetched: a browser only
+   downloads a subset whose `unicode-range` a rendered character
+   actually falls into. It costs nothing to keep and means a name with
+   a diacritic renders correctly rather than in the fallback.
+
+   The ranges below are Google's own, copied verbatim from the CSS
+   this replaced. They are not tidied — getting one wrong silently
+   moves a character to the fallback face.
+
+   ── `Tr 3 A` and `PP Neue Montreal` are still hotlinked ───────────
+   Left alone deliberately, and they are not the performance problem:
+   they load through @font-face with `font-display: swap`, which is
+   lazy and non-blocking, and every stack falls back to Inter →
+   system-ui so an outage degrades the type rather than breaking the
+   layout.
+
+   They are, however, being pulled from a Webflow project on somebody
+   else's CDN. That is a dependency nobody here controls — the files
+   can be deleted or renamed without warning — and self-hosting a
+   commercial face is a licensing question rather than an engineering
+   one. Inter and JetBrains Mono were safe to move because both are
+   under the SIL Open Font License, which permits redistribution.
+   These two need a licence check before they can follow. Flagged, not
+   fixed.
    ───────────────────────────────────────────────────────────────── */
+
+/* Inter — variable, 400–900. */
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter-latin.woff2') format('woff2');
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter-latin-ext.woff2') format('woff2');
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* JetBrains Mono — variable, 400–700. The most-used family on the
+   site: 90 `font-mono` call sites against 45 `font-display`. */
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-mono-latin.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-mono-latin-ext.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
 @font-face {
   font-family: 'Tr 3 A';
   src: url('https://cdn.prod.website-files.com/691d7c9f14d0280ebe2d4108/691d8ab14cbd4a1cf9811e7a_tr3a-Bold.woff2') format('woff2');

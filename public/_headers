@@ -85,13 +85,20 @@
 #   img-src     data:       The certificate wall paints a moving glare
 #                           over each card with an inline gradient.
 #
-#   font-src                Two third-party origins, both load-bearing:
-#                           Google serves Inter and JetBrains Mono, and
-#                           the Webflow CDN serves the two display faces
-#                           declared in src/index.css. See the note in
-#                           the audit about that second one — it is a
-#                           dependency on somebody else's asset host and
-#                           it should not stay one forever.
+#   font-src                One third-party origin now, down from two.
+#                           Inter and JetBrains Mono are self-hosted
+#                           from /fonts and covered by 'self'; the
+#                           render-blocking stylesheet on
+#                           fonts.googleapis.com that used to fetch them
+#                           is gone, and both Google origins came out of
+#                           this policy with it. See src/index.css.
+#
+#                           The Webflow CDN remains, serving the two
+#                           display faces. It is still a dependency on
+#                           somebody else's asset host, and it still
+#                           should not stay one forever — moving it is a
+#                           licensing question rather than a technical
+#                           one, which is the only reason it is here.
 #
 #   connect-src formsubmit.co
 #                           The contact form posts to the FormSubmit
@@ -163,7 +170,7 @@
 #                           here needs them and they are a classic
 #                           injection surface.
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com https://*.g.doubleclick.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.prod.website-files.com; connect-src 'self' https://cloudflareinsights.com https://formsubmit.co https://*.google-analytics.com https://*.analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; object-src 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com https://*.g.doubleclick.net; font-src 'self' data: https://cdn.prod.website-files.com; connect-src 'self' https://cloudflareinsights.com https://formsubmit.co https://*.google-analytics.com https://*.analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; object-src 'none'; upgrade-insecure-requests
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
@@ -178,6 +185,15 @@
 # revalidated. This replaces the /assets/* rule the Vite build used;
 # the directory is Next's, the reasoning is identical.
 /_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Self-hosted fonts. Not hashed, but immutable in practice: a font file
+# is replaced by a differently-named one rather than edited in place, so
+# the bytes behind /fonts/inter-latin.woff2 do not change. They are also
+# preloaded on every route and needed before first paint, which is
+# exactly the case a year-long immutable cache exists for — a
+# revalidation round trip here is a round trip in front of the text.
+/fonts/*
   Cache-Control: public, max-age=31536000, immutable
 
 # Images under public/ keep their filenames across deploys, so they get

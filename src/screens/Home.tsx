@@ -8,12 +8,13 @@ import { CapabilityWall } from '../components/CapabilityWall';
 import { EducationTimeline } from '../components/EducationTimeline';
 import { CertificationsWall } from '../components/CertificationsWall';
 import { InsightsCarousel } from '../components/InsightsCarousel';
+import { FrequentQuestions } from '../components/FrequentQuestions';
 import { ContactTakeover } from '../components/ContactTakeover';
 
 /* ─────────────────────────────────────────────────────────────────
    Section order.
 
-   Nine sections. The "discover / build / harden" process diagram and
+   Ten sections. The "discover / build / harden" process diagram and
    the About block are both gone — the first said nothing a reviewer
    would not assume of any engineer, and the second restated in cards
    what the statement, the experience section and the project pages
@@ -34,6 +35,15 @@ import { ContactTakeover } from '../components/ContactTakeover';
    template, so none read as what it was. It is now two sections: a
    chronology for education, an archive for certifications.
 
+   The questions come last, immediately before the contact takeover,
+   and they are the one section written for a specific reader: somebody
+   who searched the name and wants to know within one screen whether
+   this is the right person. By that point every answer in it has
+   already been made further up with its evidence attached, so it reads
+   as a recapitulation rather than as an introduction. It is also the
+   visible half of the FAQPage structured data — see src/lib/faq.ts for
+   why the two ship together or not at all.
+
    Evidence leads: one line of positioning after the hero, then the
    work. Surfaces alternate so the page reads as chapters rather than
    stripes.
@@ -49,6 +59,7 @@ export function Home() {
       {/* bone  */} <EducationTimeline />
       {/* bone- */} <CertificationsWall />
       {/* bone  */} <InsightsCarousel />
+      {/* bone  */} <FrequentQuestions />
       {/* ink   */} <ContactTakeover />
     </main>
   );

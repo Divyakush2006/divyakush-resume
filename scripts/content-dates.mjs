@@ -36,12 +36,36 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const STORE = path.join(ROOT, 'seo', 'content-dates.json');
 
 /* One key per body of content that a route is built from. `home`
-   renders all three, so it is as new as the newest of them. */
+   renders all of them, so it is as new as the newest of them.
+
+   Every path here is a *content* module, and `experience` only became
+   one when the five engagements moved out of
+   `src/components/ExperienceRoles.tsx` into `src/lib/roles.ts` so that
+   the structured data could read them too.
+
+   Repointing it was not optional. Hashing the component meant the
+   home page's `lastmod` moved whenever the section's *markup* changed
+   — a class name, a scroll constant, a comment — none of which is a
+   change to the record a reader or a crawler sees. The move itself
+   demonstrated it: relocating the array without editing a single date
+   or a single line of prose re-stamped the home page as modified.
+
+   A `lastmod` that moves when nothing changed is the thing this file
+   was written to stop. Google treats a sitemap whose dates move on
+   every deploy as a sitemap whose dates mean nothing, and then stops
+   reading them — which costs exactly the recrawl the field exists to
+   request. So the key follows the content, and the component is free
+   to be edited without lying about it.
+
+   `faq` is here for the same reason: the eight questions are content,
+   they are rendered on the home page and published as FAQPage, and
+   the home page is genuinely modified when one of them changes. */
 const SOURCES = {
   projects: 'src/lib/projects.ts',
   insights: 'src/lib/insights.ts',
   certifications: 'src/lib/certifications.ts',
-  experience: 'src/components/ExperienceRoles.tsx',
+  experience: 'src/lib/roles.ts',
+  faq: 'src/lib/faq.ts',
 };
 
 /* Seeding a key for the first time, git is still the best answer

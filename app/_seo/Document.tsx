@@ -1,7 +1,9 @@
 import { preload } from 'react-dom';
 
 import { HERO_SET, HERO_SIZES, HERO_SRC } from '../../src/lib/hero-image';
-import { NAME, ORIGIN, type RouteSeo } from '../../src/lib/seo';
+import { NAME, ORIGIN, SAME_AS, type RouteSeo } from '../../src/lib/seo';
+import { PROJECTS } from '../../src/lib/projects';
+import { INSIGHTS } from '../../src/lib/insights';
 
 /* ─────────────────────────────────────────────────────────────────
    Everything a machine reads, for one route.
@@ -51,11 +53,108 @@ export function NoscriptProse({ seo }: { seo: RouteSeo }) {
       {seo.body.map((p, i) => (
         <p key={i}>{p}</p>
       ))}
+
+      {/* ── The site's link graph, for readers that never run the
+             bundle ────────────────────────────────────────────────
+          This used to be one anchor pointing at the home page, and
+          that single link was the whole internal link structure as far
+          as any non-rendering crawler was concerned.
+
+          It showed up in a third-party audit as "Internal links: 1,
+          External links: 0" — numbers that looked absurd next to a
+          site with twenty-three routes, until you notice the cause.
+          The application is client-rendered by design (see
+          app/_components/AppShell.tsx for the argument), so the
+          document contains no <a> elements at all. The audit's crawler
+          did not execute JavaScript, found the one link in here, and
+          reported exactly what it saw.
+
+          The rendered page has 47 internal and 2 external links, so
+          nothing was actually missing from the *site*. What was
+          missing was any way for a non-rendering reader to discover
+          the other twenty-two documents by following links, rather
+          than by being handed sitemap.xml and trusting it. Those are
+          not the same signal: a sitemap says a URL exists, a link says
+          a URL is worth reaching and says what it is called. Anchor
+          text is the oldest ranking input there is and this site was
+          publishing none of it.
+
+          That matters beyond audit tools. Google renders, but
+          rendering is queued and can lag the initial crawl by days;
+          Bing renders far less reliably; the LinkedIn and Slack
+          unfurlers and every AI crawler welcomed by name in
+          public/robots.txt do not render at all.
+
+          Kept to the two real hubs plus the profiles — the full route
+          list with real titles as anchor text. It is the same
+          information as sitemap.xml, said in the form a crawler
+          actually follows. */}
+      <nav>
+        <h2>Selected work</h2>
+        <ul>
+          {PROJECTS.map((p) => (
+            <li key={p.slug}>
+              <a href={`${ORIGIN}/projects/${p.slug}`}>{p.title}</a> — {p.summary}
+            </li>
+          ))}
+        </ul>
+
+        <h2>Record</h2>
+        <ul>
+          {INSIGHTS.map((i) => (
+            <li key={i.slug}>
+              <a href={`${ORIGIN}/insights/${i.slug}`}>{i.title}</a>
+              {i.location ? ` — ${i.location}` : ''}
+            </li>
+          ))}
+        </ul>
+
+        <h2>Elsewhere</h2>
+        <ul>
+          {SAME_AS.map((url) => (
+            <li key={url}>
+              {/* rel="me" for the same reason the <link rel="me"> tags
+                  in the layout exist: it is the relation that says
+                  "this profile is the same person", and it is what
+                  IndieAuth and several verifiers read. Not nofollow —
+                  these are the author's own profiles and the outbound
+                  association is the point. */}
+              <a href={url} rel="me">
+                {url.replace(/^https?:\/\/(www\.)?/, '')}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
       <p>
         <a href={`${ORIGIN}/`}>{NAME}</a>
       </p>
     </noscript>
   );
+}
+
+/* The two self-hosted faces, asked for immediately.
+
+   A @font-face URL is not discovered until the stylesheet referencing
+   it has been parsed *and* a character needing it has been laid out,
+   which puts the fetch several steps into a cascade it does not have
+   to be in. Both of these are used above the fold on every route.
+
+   Only the `latin` subsets. `latin-ext` is declared in src/index.css
+   and stays lazy on purpose — preloading a file that is almost never
+   rendered would spend the request this is trying to save.
+
+   Through ReactDOM.preload rather than a rendered <link>: React emits
+   a hoisted copy *and* its own registered copy of an authored preload
+   tag, which put two of each in every document. Same reason, same fix,
+   same failure as HeroPreload below — and post-build.mjs asserts the
+   counts because that is how the first one was found. */
+export function FontPreload() {
+  for (const href of ['/fonts/inter-latin.woff2', '/fonts/jetbrains-mono-latin.woff2']) {
+    preload(href, { as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' });
+  }
+  return null;
 }
 
 /* The hero portrait is the Largest Contentful Paint element on `/` and

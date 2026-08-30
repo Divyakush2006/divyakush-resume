@@ -80,6 +80,18 @@ const REQUIRED = {
      it publishes neither and gets no stars. That is the correct
      outcome, not a gap to fill. */
   SoftwareApplication: ['name', 'url'],
+  FAQPage: ['mainEntity'],
+  Question: ['name', 'acceptedAnswer'],
+  Answer: ['text'],
+  Occupation: ['name'],
+  ItemList: ['itemListElement'],
+  Place: ['name'],
+  Country: ['name'],
+  Organization: ['name'],
+  CollegeOrUniversity: ['name'],
+  Role: ['roleName'],
+  Review: ['author', 'reviewBody'],
+  EducationalOccupationalCredential: ['name'],
 };
 
 const isAbsolute = (v) => typeof v === 'string' && /^https?:\/\//.test(v);
@@ -112,6 +124,115 @@ function checkBreadcrumb(node, where) {
   });
 }
 
+/* ── The reviews rule ─────────────────────────────────────────────
+   This is the check that exists because of a specific request, and it
+   is the one most likely to be quietly deleted by somebody in a hurry.
+   Read `src/lib/endorsements.ts` before touching it.
+
+   The brief was to publish invented five-star reviews from invented
+   people so that a search result would draw stars. That is:
+
+     · self-serving review markup — a review of an entity, published by
+       that entity — which Google's structured-data policy names as
+       spam, and
+     · fabricated review content, which it names separately,
+
+   both enforced by manual action rather than by silently dropping the
+   block. A manual action removes every rich result the domain has and
+   can demote the domain. The star it was meant to win has not been
+   drawn for self-hosted reviews of one's own work since 2019.
+
+   So the rules below are mechanical, and they fail the build rather
+   than relying on anybody remembering:
+
+     1. **No `aggregateRating`, anywhere.** There is no population of
+        ratings to aggregate. A summary statistic over a set that does
+        not exist is the single clearest fabrication signal available,
+        and there is no honest reason for this property to appear on
+        this site.
+
+     2. **Every `Review` author needs a `sameAs`.** A reviewer with no
+        profile that resolves is indistinguishable from one who does not
+        exist — which is the entire problem. This is what makes adding a
+        fake reviewer harder than adding a real one.
+
+     3. **Every `Review` needs `reviewBody` and `datePublished`.** Real
+        endorsements have words and a date. Placeholders tend not to.
+
+   If a genuine endorsement is ever added and this check fails it, the
+   fix is the missing profile URL, not the missing check. */
+function checkReviews(graph, where) {
+  const seen = [];
+  const walk = (v) => {
+    if (Array.isArray(v)) return v.forEach(walk);
+    if (!v || typeof v !== 'object') return;
+
+    if (v.aggregateRating !== undefined) {
+      fail(
+        where,
+        'aggregateRating is published — there is no set of real ratings to ' +
+          'aggregate. See src/lib/endorsements.ts.',
+      );
+    }
+
+    if (String(v['@type']) === 'Review') {
+      seen.push(v);
+      const author = v.author;
+      if (!author || !author.sameAs) {
+        fail(where, `Review by "${author?.name ?? 'unnamed'}" has no author.sameAs — a reviewer must resolve to a real profile`);
+      }
+      if (!v.reviewBody) fail(where, 'Review has no reviewBody');
+      if (!v.datePublished) fail(where, 'Review has no datePublished');
+    }
+
+    Object.values(v).forEach(walk);
+  };
+  walk(graph);
+  return seen.length;
+}
+
+/* ── The FAQ rule ─────────────────────────────────────────────────
+   Marked-up text a visitor cannot read is "hidden content", and it is
+   the other manual-action offence in this file's neighbourhood.
+
+   Every FAQ question published as JSON-LD has to be findable in the
+   document that publishes it. Both halves come from `src/lib/faq.ts`,
+   so they agree today; this is what notices when somebody adds a
+   question to the graph without adding it to the page, or removes the
+   section and leaves the markup behind.
+
+   The document carries the questions twice — once in the rendered
+   <details> markup and once in the <noscript> prose — so a plain
+   substring search over the HTML is the right test. Entities are
+   decoded first because React writes `&#x27;` where the source has a
+   typographic apostrophe. */
+function checkFaqIsVisible(graph, html, where) {
+  const text = html
+    .replace(/&#x27;/g, "'")
+    .replace(/&#39;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, '&')
+    .replace(/\\u003c/g, '<');
+
+  let questions = 0;
+  for (const node of graph) {
+    if (String(node['@type']) !== 'FAQPage') continue;
+    for (const q of node.mainEntity ?? []) {
+      questions++;
+      const name = String(q.name ?? '');
+      /* The JSON-LD copy is inside the <script> block, so a match has
+         to be found somewhere other than there. Strip the block first. */
+      const body = text.replace(/<script type="application\/ld\+json"[\s\S]*?<\/script>/g, '');
+      if (!body.includes(name)) {
+        fail(where, `FAQ question is in the graph but not on the page: "${name.slice(0, 60)}…"`);
+      }
+      const answer = String(q.acceptedAnswer?.text ?? '');
+      if (!answer.trim()) fail(where, `FAQ question "${name.slice(0, 40)}…" has an empty answer`);
+    }
+  }
+  return questions;
+}
+
 /** `url` and `item` address documents. `@id` names nodes and may use #. */
 function checkFragments(node, where, type) {
   for (const key of ['url', 'item', 'contentUrl', 'mainEntityOfPage']) {
@@ -127,6 +248,8 @@ const routes = all.filter((d) => !NOT_ROUTES.has(d.url));
 
 let graphs = 0;
 let breadcrumbs = 0;
+let faqQuestions = 0;
+let reviews = 0;
 
 for (const doc of routes) {
   const html = fs.readFileSync(doc.file, 'utf8');
@@ -164,7 +287,24 @@ for (const doc of routes) {
       breadcrumbs++;
       checkBreadcrumb(node, doc.url);
     }
+
+    /* The required-field loop above only walks top-level nodes, and
+       Google's FAQ format nests every Question inside the FAQPage. So
+       an FAQPage with eight malformed Questions passed all of this
+       until the nesting was walked explicitly. */
+    if (type === 'FAQPage') {
+      for (const q of node.mainEntity ?? []) {
+        for (const field of REQUIRED.Question) {
+          if (q[field] === undefined) fail(doc.url, `Question is missing required field "${field}"`);
+        }
+        const answer = q.acceptedAnswer;
+        if (answer && answer.text === undefined) fail(doc.url, 'Answer is missing required field "text"');
+      }
+    }
   }
+
+  reviews += checkReviews(graph, doc.url);
+  faqQuestions += checkFaqIsVisible(graph, html, doc.url);
 
   /* Every { "@id": … } reference has to land on a node in this graph.
      A dangling one is a node the consumer silently drops. */
@@ -180,7 +320,11 @@ for (const doc of routes) {
   for (const r of refs) if (!ids.has(r)) fail(doc.url, `dangling @id reference: ${r}`);
 }
 
-console.log(`\n${graphs} documents with structured data, ${breadcrumbs} carrying a breadcrumb\n`);
+console.log(
+  `\n${graphs} documents with structured data, ${breadcrumbs} carrying a breadcrumb,\n` +
+    `${faqQuestions} FAQ question(s) published and checked against the page, ` +
+    `${reviews} review(s)\n`,
+);
 
 if (problems.length) {
   console.log(`${problems.length} problem(s):\n`);
@@ -190,4 +334,6 @@ if (problems.length) {
 }
 
 console.log('  every graph resolves, every breadcrumb is complete, and no');
-console.log('  structured-data URL points at a fragment.\n');
+console.log('  structured-data URL points at a fragment.');
+console.log('  every published FAQ answer is also on the page, no rating is');
+console.log('  aggregated, and every reviewer resolves to a real profile.\n');

@@ -74,10 +74,21 @@ const SOURCE = {
   projects: RECORDED.projects ?? BUILD_DATE,
   insights: RECORDED.insights ?? BUILD_DATE,
   certifications: RECORDED.certifications ?? BUILD_DATE,
-  /* The roles are data too, even though they live in the component
-     that renders them. The home page shows them, so editing one
-     changes the home page. */
+  /* The five engagements. They now live in `src/lib/roles.ts` with the
+     rest of the content rather than inside the component that renders
+     them, which is what let the structured data read the same records
+     the section prints. */
   experience: RECORDED.experience ?? BUILD_DATE,
+  /* The eight questions. They are rendered on the home page and
+     published as FAQPage from the same array, so a new question is a
+     genuine modification of this page — which is exactly what a
+     `lastmod` is for, and the one honest way to ask for a recrawl.
+
+     Missing from this map when the FAQ shipped, so the home page
+     advertised a date a week older than its newest content and the
+     recrawl was never requested. `scripts/content-dates.mjs` had
+     recorded the date correctly; nothing read it. */
+  faq: RECORDED.faq ?? BUILD_DATE,
 } as const;
 
 /* The home page renders all of it, so it is as new as the newest

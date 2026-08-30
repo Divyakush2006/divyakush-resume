@@ -1,6 +1,8 @@
 'use client';
 
-import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
+
+import App from '../../src/App';
 
 /* ─────────────────────────────────────────────────────────────────
    The application, mounted in the browser.
@@ -60,15 +62,53 @@ import dynamic from 'next/dynamic';
    404, no canonical mismatch.
 
    ── The one line that would change it ─────────────────────────────
-   Delete `{ ssr: false }`. Everything else about this file, and every
-   route in `app/`, is already written for it. When the seven branches
-   become CSS, that is the whole change.
+   Delete the mount gate below. Everything else about this file, and
+   every route in `app/`, is already written for it. When the seven
+   branches become CSS, that is the whole change.
+
+   ── Why this is no longer next/dynamic ────────────────────────────
+   It was `dynamic(() => import('../../src/App'), { ssr: false })`, and
+   that spelling cost about three seconds of first paint.
+
+   `dynamic()` does two separable things: it keeps a module out of the
+   server render, and it moves that module into a chunk fetched at
+   runtime. Only the first was wanted here. The second built a
+   waterfall, and the built output showed it plainly — the application
+   chunk was 528KB and its filename appeared **nowhere in the HTML**.
+   Nothing could ask for it until the framework had downloaded,
+   parsed and executed enough to reach the import. Two full
+   network-then-execute phases, in series, in front of the first pixel:
+
+     HTML → 574KB framework → execute → *now* discover App
+          → 528KB application → execute → paint
+
+   A static import removes the second phase. The module joins the
+   normal client graph, so Next emits it as a preload in the document
+   and the browser fetches it alongside the framework rather than
+   after it.
+
+   The no-server-render guarantee is kept, and kept more precisely
+   than before: `mounted` is false during the render that produces the
+   static HTML, so this returns null and not one branch of the tree is
+   committed to a document. The import is what became eager. The
+   *render* is exactly as deferred as it was, which is the property
+   the whole note above is about.
+
+   The effect this has on the seven media-query branches is nil. They
+   are evaluated in effects after mount, which is the same moment they
+   were evaluated before.
    ───────────────────────────────────────────────────────────────── */
 
-const App = dynamic(() => import('../../src/App'), { ssr: false });
-
 export function AppShell() {
-  return <App />;
+  /* The mount gate. False on the server and on the very first client
+     render, so the static document contains no application markup and
+     hydration has nothing to disagree with. True immediately after,
+     which is when the media queries the tree branches on can actually
+     be asked. */
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  return mounted ? <App /> : null;
 }
 
 export default AppShell;

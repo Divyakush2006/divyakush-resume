@@ -147,6 +147,16 @@ function headersFor(url) {
   return out;
 }
 
+/** The file that answers a path, by Pages' resolution order. */
+function resolveFile(url) {
+  const candidates = [
+    path.join(DIST, url),
+    path.join(DIST, url, 'index.html'),
+    path.join(DIST, url + '.html'),
+  ];
+  return candidates.find((f) => fs.existsSync(f) && fs.statSync(f).isFile());
+}
+
 http
   .createServer((req, res) => {
     const url = decodeURIComponent(req.url.split('?')[0]);
@@ -155,24 +165,50 @@ http
        redirect even when a file would have answered. */
     const redirect = redirectFor(url);
     if (redirect) {
+      /* ── Status 200 is a rewrite, not a redirect ──────────────────
+         Cloudflare serves the destination's *content* at the source
+         URL, with no hop and no Location header. This mimic used to
+         treat every rule the same way — `writeHead(status, {location})`
+         — which for a 200 produced the one response Cloudflare never
+         produces: a 200, carrying a Location header, with an empty
+         body.
+
+         It went unnoticed for as long as every rule in
+         `public/_redirects` was a real redirect. It stopped being
+         unnoticeable when the Search Console verification file needed a
+         rewrite to answer 200 at its `.html` URL, because that is a
+         rule whose entire purpose is the body — and this server
+         reported it fixed while serving nothing.
+
+         A mimic that is wrong about the one behaviour you are testing
+         is worse than no mimic, so it now does what Pages does. */
+      if (redirect.status === 200) {
+        const target = resolveFile(redirect.to);
+        if (target) {
+          res.writeHead(200, {
+            'content-type': TYPES[path.extname(target)] ?? 'application/octet-stream',
+            ...headersFor(url),
+          });
+          return res.end(fs.readFileSync(target));
+        }
+        /* A rewrite naming a path that does not exist is a broken rule.
+           Say so rather than falling through to a 404 that looks like a
+           missing page. */
+        res.writeHead(500, { 'content-type': 'text/plain; charset=utf-8' });
+        return res.end(`_redirects rewrites ${url} to ${redirect.to}, which does not exist\n`);
+      }
+
       res.writeHead(redirect.status, { location: redirect.to, ...headersFor(url) });
       return res.end();
     }
 
-    const candidates = [
-      path.join(DIST, url),
-      path.join(DIST, url, 'index.html'),
-      path.join(DIST, url + '.html'),
-    ];
-
-    for (const f of candidates) {
-      if (fs.existsSync(f) && fs.statSync(f).isFile()) {
-        res.writeHead(200, {
-          'content-type': TYPES[path.extname(f)] ?? 'application/octet-stream',
-          ...headersFor(url),
-        });
-        return res.end(fs.readFileSync(f));
-      }
+    const found = resolveFile(url);
+    if (found) {
+      res.writeHead(200, {
+        'content-type': TYPES[path.extname(found)] ?? 'application/octet-stream',
+        ...headersFor(url),
+      });
+      return res.end(fs.readFileSync(found));
     }
 
     res.writeHead(404, {

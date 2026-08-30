@@ -26,7 +26,8 @@
     "snapshot": "node scripts/snapshot.mjs",
     "snapshot:diff": "node scripts/snapshot-diff.mjs",
     "audit:schema": "node scripts/audit-schema.mjs",
-    "content:dates": "node scripts/content-dates.mjs"
+    "content:dates": "node scripts/content-dates.mjs",
+    "indexnow": "node scripts/indexnow.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",

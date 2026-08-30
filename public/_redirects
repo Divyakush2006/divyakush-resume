@@ -52,3 +52,33 @@
 # the Location header, so the visitor lands on the work section.
 
 /projects  /#work  301
+
+# ── The Search Console verification file ──────────────────────────
+#
+# Google's HTML-file verification requires that the exact URL
+#
+#     /google0dbb222546d95f4f.html
+#
+# answers 200 with the token in it. Cloudflare Pages will not do that
+# on its own: it normalises every `.html` request to the extensionless
+# path with a 308, so the file that was uploaded to prove ownership of
+# the domain answers a redirect instead of the token. Verified with
+# curl — `HTTP/1.1 308`, `Location: /google0dbb222546d95f4f`.
+#
+# Nothing is currently broken by that. The live property is verified by
+# DNS TXT on the apex, which is strictly better: a Domain property
+# covers every subdomain and both protocols, where an HTML file only
+# ever proves one host. That is why this went unnoticed.
+#
+# It is fixed anyway, because the failure mode is nasty and delayed. If
+# the DNS record is ever dropped — a nameserver move, a zone rebuild —
+# Google falls back to re-checking the other verification tokens it
+# knows about, finds this one redirecting, and unverifies the property.
+# The property disappearing is how you find out, and by then the
+# sitemap submissions and the URL inspection history have gone with it.
+#
+# A 200 rewrite rather than a redirect: the same content served at the
+# `.html` URL, no hop, which is exactly what the verifier checks for.
+# It is a single exact path, so it shadows nothing — see the long note
+# above on why a catch-all cannot come back.
+/google0dbb222546d95f4f.html  /google0dbb222546d95f4f  200

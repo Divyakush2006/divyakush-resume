@@ -89,5 +89,6 @@ export const FOOTER_NAV = [
   { label: 'Education',      href: '#education' },
   { label: 'Certifications', href: '#certifications' },
   { label: 'Insights',       href: '#insights' },
+  { label: 'Questions',      href: '#questions' },
   { label: 'Contact',        href: '#contact' },
 ] as const;

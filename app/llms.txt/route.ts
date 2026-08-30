@@ -1,4 +1,5 @@
 import { NAME, ORIGIN, SAME_AS, allRoutes } from '../../src/lib/seo';
+import { FAQ, answerText } from '../../src/lib/faq';
 
 /* ─────────────────────────────────────────────────────────────────
    llms.txt
@@ -37,6 +38,19 @@ export function GET() {
     `Artificial Intelligence from IIT Ropar. Builds multi-tenant SaaS platforms, ` +
     `semantic retrieval pipelines and production machine learning services.\n\n` +
     `Canonical home: ${ORIGIN}/\n\n` +
+    /* ── The questions, first ─────────────────────────────────────
+       Above the project index deliberately. A reader that arrives here
+       is answering "who is this person" — that is the query this file
+       gets fetched for — and the eight questions answer it directly,
+       in the format these readers are best at extracting and quoting.
+       A list of ten project links answers a different question, and
+       answers it after.
+
+       Same array as the page and the FAQPage markup. Three consumers,
+       one source: see src/lib/faq.ts. */
+    `## Questions\n\n` +
+    FAQ.map((entry) => `### ${entry.question}\n\n${answerText(entry)}`).join('\n\n') +
+    `\n\n` +
     `## Projects\n\n${list('/projects/')}\n\n` +
     `## Record\n\n${list('/insights/')}\n\n` +
     `## Elsewhere\n\n${SAME_AS.map((u) => `- ${u}`).join('\n')}\n`;

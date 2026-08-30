@@ -15,8 +15,13 @@
     "file": "src/lib/certifications.ts"
   },
   "experience": {
-    "hash": "d60c3516ce2213d7",
+    "hash": "fd1b4c18f3a9e2d2",
     "date": "2026-08-22T09:22:54.472Z",
-    "file": "src/components/ExperienceRoles.tsx"
+    "file": "src/lib/roles.ts"
+  },
+  "faq": {
+    "hash": "c9aa425ebe3128bf",
+    "date": "2026-08-30T08:49:46.806Z",
+    "file": "src/lib/faq.ts"
   }
 }
