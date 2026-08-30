@@ -60,7 +60,7 @@ export const metadata: Metadata = {
                                  thumbnail-sized image. This site is a
                                  portfolio whose evidence is
                                  photographic — twelve event
-                                 photographs, eighteen certificate
+                                 photographs, twelve certificate
                                  scans, ten project covers — and this
                                  one token decides how much of that a
                                  person sees before deciding to click.

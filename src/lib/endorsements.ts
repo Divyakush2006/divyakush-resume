@@ -18,7 +18,7 @@
         demote the domain itself.
 
      2. **It would burn the asset it was meant to help.** Everything
-        else on this site is checkable — eighteen certificate scans
+        else on this site is checkable — twelve certificate scans
         with credential numbers, two named degrees, five named
         employers, four live product URLs. That verifiability is the
         entire ranking case for a personal name against an aged
@@ -41,7 +41,7 @@
    The credibility signal that fake reviews are a forgery *of* is real,
    obtainable, and this person already has most of it:
 
-     · **Credentials.** Eighteen documents in `certifications.ts`, most
+     · **Credentials.** Twelve documents in `certifications.ts`, most
        carrying an issuer-checkable credential number, already marked
        up as `EducationalOccupationalCredential` on the Person node.
        This is the strongest thing in the graph and it is genuine.

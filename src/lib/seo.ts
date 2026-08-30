@@ -257,7 +257,7 @@ const person: Node = {
 };
 
 /* ── Credentials ──────────────────────────────────────────────────
-   The eighteen documents the Certifications section renders, as
+   The twelve documents the Certifications section renders, as
    schema. Every one of them is on the page, openable full size, and
    several print a credential number that can be checked against the
    issuer — which is the whole test for whether a claim belongs in
