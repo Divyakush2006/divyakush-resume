@@ -85,6 +85,27 @@
 #   img-src     data:       The certificate wall paints a moving glare
 #                           over each card with an inline gradient.
 #
+#   img-src     NOT www.google.com, and deliberately.
+#                           GA4's remarketing pixel, /ads/ga-audiences,
+#                           was being blocked here and logging a console
+#                           violation on every page view.
+#
+#                           It cannot be allowed by widening this
+#                           policy. The pixel is served from the
+#                           visitor's *country* Google domain —
+#                           www.google.co.in from India, www.google.de
+#                           from Germany — and CSP has no wildcard for a
+#                           top-level domain, so permitting it means
+#                           listing ~190 ccTLDs in a header that ships
+#                           on every request, to allow a tracker.
+#
+#                           It is switched off at the source instead:
+#                           `allow_google_signals: false` in
+#                           public/ga.js. The request is never made, the
+#                           policy stays narrow, and audit:csp still
+#                           proves the site runs clean under it rather
+#                           than carrying a permanent exception.
+#
 #   font-src                One third-party origin now, down from two.
 #                           Inter and JetBrains Mono are self-hosted
 #                           from /fonts and covered by 'self'; the
@@ -110,13 +131,40 @@
 #
 #     script-src  www.googletagmanager.com   (above)
 #
-#     connect-src *.google-analytics.com, *.analytics.google.com,
+#     connect-src *.google-analytics.com, analytics.google.com,
+#                 *.analytics.google.com, www.google.com,
 #                 stats.g.doubleclick.net
 #                           Where events are POSTed. The wildcards are
 #                           not laziness: GA4 sends to a regional
 #                           endpoint chosen at runtime — region1,
 #                           region4 and so on — so the exact host is not
 #                           known when this file is written.
+#
+#                           `analytics.google.com` is listed WITHOUT a
+#                           wildcard as well as with one, and that
+#                           duplication is the whole point. In CSP,
+#                           `*.example.com` matches subdomains and NOT
+#                           the apex — so `*.analytics.google.com`
+#                           permitted region1.analytics.google.com and
+#                           refused analytics.google.com itself, which
+#                           is the host this tag actually chose.
+#
+#                           The effect was not console noise. It was
+#                           that GA4's page_view never left the browser:
+#                           every /g/collect POST was refused, and the
+#                           only request that got through was the
+#                           DoubleClick sync, which measures nothing.
+#                           The site has been reporting almost no
+#                           analytics for as long as this policy has
+#                           been live, silently, because a blocked
+#                           beacon looks identical to no traffic.
+#
+#                           `www.google.com` is NOT listed. It carries
+#                           GA4's Google Signals collection, and Signals
+#                           is disabled in public/ga.js — see the
+#                           img-src note above. Adding it back without
+#                           re-enabling Signals would widen the policy
+#                           for a request nothing makes.
 #
 #     img-src     www.google-analytics.com, www.googletagmanager.com,
 #                 *.g.doubleclick.net
@@ -170,7 +218,7 @@
 #                           here needs them and they are a classic
 #                           injection surface.
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com https://*.g.doubleclick.net; font-src 'self' data: https://cdn.prod.website-files.com; connect-src 'self' https://cloudflareinsights.com https://formsubmit.co https://*.google-analytics.com https://*.analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; object-src 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com https://*.g.doubleclick.net; font-src 'self' data: https://cdn.prod.website-files.com; connect-src 'self' https://cloudflareinsights.com https://formsubmit.co https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://stats.g.doubleclick.net https://www.googletagmanager.com; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co; object-src 'none'; upgrade-insecure-requests
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
