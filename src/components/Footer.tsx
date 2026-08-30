@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-import { ArrowUp, Briefcase, Github, Linkedin } from 'lucide-react';
+import { ArrowUp, Briefcase, Github, Linkedin, Star } from 'lucide-react';
 import { FOOTER_NAV, PROFILE } from '../lib/content';
 import { EASE_OUT } from '../lib/motion';
 import { SectionLink } from './primitives';
@@ -36,6 +36,46 @@ const SOCIALS = [
   { name: 'LinkedIn', url: PROFILE.links.linkedin, icon: Linkedin },
   { name: 'GitHub', url: PROFILE.links.github, icon: Github },
 ];
+
+/* ── Google preferred sources ─────────────────────────────────────
+   The deeplink that opens Google's source-preferences dialog with this
+   site filled in. A reader who confirms it gets a "Preferred" badge on
+   this domain's links inside AI Overviews and AI Mode, and Google
+   reports preferred sources are around twice as likely to be clicked.
+
+   ── Why a link and not Google's button ────────────────────────────
+   Google documents two ways to offer this. The recommended one is two
+   lines: a <script> from news.google.com and a <div> the library fills
+   with a translated, themed button. It is not used here.
+
+   That script is a third-party origin, and `script-src` in
+   public/_headers currently permits exactly `'self'`,
+   googletagmanager and Cloudflare Insights. Adding news.google.com —
+   and whatever `connect-src` and `frame-src` the library needs once it
+   initialises — widens a policy that was just narrowed, to render a
+   button. It is also another blocking third-party script on a site
+   whose weakest measurement is mobile first paint.
+
+   The deeplink is Google's own documented no-JavaScript alternative.
+   It costs one anchor: no script, no CSP change, no request until the
+   reader clicks.
+
+   ── What this does and does not do ────────────────────────────────
+   Preferred sources are chosen by readers, not granted by Google.
+   There is no application, no approval and no markup that qualifies a
+   site — eligibility is only that it is a domain or subdomain (not a
+   subdirectory) publishing fresh content, which this is. So this link
+   does not make the site a preferred source; it removes the friction
+   for somebody who already wants to pick it. That is the whole of what
+   is available here, and worth exactly one anchor in a footer.
+
+   Built from `PROFILE.links.site` rather than typed, so the host in
+   the query cannot drift from the host the site is served on — the
+   dialog matches on that string. */
+const PREFERRED_SOURCE_URL = `https://www.google.com/preferences/source?q=${
+  new URL(PROFILE.links.site).host
+}`;
+
 
 /** The account, not the URL. The row already names the platform, so the
     host is noise; the handle is the part that identifies anything. */
@@ -205,6 +245,36 @@ export function Footer() {
                 {time} <span className="text-bone-raised/55">IST · UTC+5:30</span>
               </dd>
             </dl>
+
+            {/* Not in the "Elsewhere" column, deliberately. Those two
+                rows are profiles of this person, they carry rel="me" in
+                the crawler-facing markup, and they are what `sameAs` in
+                the JSON-LD names. A Google preference dialog is an
+                action a reader takes, not an account he holds, and
+                filing it with the profiles would weaken the one signal
+                that column exists to make. */}
+            <div className="mt-8 border-t border-white/8 pt-6">
+              <p className={COLUMN_LABEL}>On Google</p>
+              <a
+                href={PREFERRED_SOURCE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                /* `py-1.5` with the top margin reduced to match, so the
+                   link sits where it looks like it should while its hit
+                   area clears 24px. At `mt-3` with no padding the box
+                   measured 221x23 and `npm run audit:responsive` failed
+                   it — one pixel under the WCAG 2.2 target-size
+                   minimum, which is exactly the kind of miss that is
+                   invisible on a desktop and irritating on a phone. */
+                className="group mt-1.5 inline-flex items-start gap-2.5 py-1.5 text-sm leading-relaxed text-bone-raised/65 transition-colors duration-200 hover:text-bone-raised"
+              >
+                <Star
+                  className="mt-0.5 h-4 w-4 shrink-0 text-bone-raised/55 transition-colors duration-200 group-hover:text-accent"
+                  aria-hidden="true"
+                />
+                <span className="max-w-[26ch]">Set this site as a preferred source</span>
+              </a>
+            </div>
           </div>
         </div>
 
