@@ -406,11 +406,32 @@ const logo: Node = {
   caption: NAME,
 };
 
+/* ── The site's own name ──────────────────────────────────────────
+   `name` and `alternateName` on a WebSite node are what Google reads
+   to decide the **site name** it prints above a result, in place of
+   the bare domain. It is one of the few places the mononym can be
+   stated as a fact about the property rather than about the person.
+
+   `alternateName` is documented for exactly this: a shorter
+   alternative Google may use instead of the full name. "Divyakush" is
+   a true alternative here — it is the handle on every profile the site
+   links to (dev.to/divyakush, about.me/divyakush), it is the
+   `profile:username` in app/layout.tsx, and it is the string somebody
+   types when they drop the surname.
+
+   Worth being clear about what this is and is not. It is a naming
+   signal, not a ranking one: it tells Google what to *call* this site
+   once it has decided to show it. It does not decide whether to show
+   it. For the bare "divyakush" query the deciding factors are entity
+   strength and which result people click, and no property in this file
+   reaches either. See the note on ALTERNATE_NAMES above for why the
+   list of names is short rather than stuffed. */
 const website: Node = {
   '@type': 'WebSite',
   '@id': `${ORIGIN}/#website`,
   url: `${ORIGIN}/`,
   name: NAME,
+  alternateName: 'Divyakush',
   publisher: { '@id': `${ORIGIN}/#person` },
   inLanguage: 'en',
 };

@@ -68,7 +68,19 @@ export const FAQ: FaqEntry[] = [
     id: 'who',
     question: 'Who is Divyakush Punjabi?',
     answer: [
-      'Divyakush Punjabi is a full stack and AI systems engineer based in Vellore, Tamil Nadu, India. ' +
+      /* The mononym is stated once, in the first sentence of the first
+         answer, because "Divyakush" on its own is a query this site
+         should resolve and currently does not.
+
+         Once, and as a fact rather than as a keyword. It is true — it
+         is the handle on dev.to, on about.me and on GitHub — and it is
+         the honest way to connect the short string to the full name.
+         What it is not is a licence to repeat it: a second question
+         asking "Who is Divyakush?" alongside this one would be a
+         near-duplicate of an answer already on the page, which is the
+         pattern that reads as stuffing rather than as an answer. */
+      'Divyakush Punjabi — known simply as Divyakush — is a full stack and AI systems engineer based ' +
+        'in Vellore, Tamil Nadu, India. ' +
         'He led engineering at LMX Labs as Software Engineering Lead, where he shipped two platforms that ' +
         'run in production, and built the retrieval side of GovernAI’s open-source research tooling.',
       'He reads a B.Tech in Computer Engineering at Vellore Institute of Technology and holds a Major ' +
