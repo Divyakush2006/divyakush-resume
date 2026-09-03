@@ -70,10 +70,22 @@ const SOCIALS = [
    is available here, and worth exactly one anchor in a footer.
 
    Built from `PROFILE.links.site` rather than typed, so the host in
-   the query cannot drift from the host the site is served on — the
-   dialog matches on that string. */
+   the query cannot drift from the host the site is served on.
+
+   ── Bare domain, not the `www` host ───────────────────────────────
+   The first version passed `new URL(...).host`, which is
+   `www.divyakush.com`, and Google's own documented deeplink is
+
+     https://www.google.com/preferences/source?q=example.com
+
+   — the registrable domain, with no subdomain. The tool works at
+   domain and subdomain level, and `www` is a subdomain: asking it for
+   `www.divyakush.com` asks a question about a different string from
+   the one it files the site under. So the prefix is stripped, and only
+   that prefix — a real subdomain would still be passed through, which
+   is what the anchored `^` is for. */
 const PREFERRED_SOURCE_URL = `https://www.google.com/preferences/source?q=${
-  new URL(PROFILE.links.site).host
+  new URL(PROFILE.links.site).host.replace(/^www\./, '')
 }`;
 
 
