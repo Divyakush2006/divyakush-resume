@@ -341,6 +341,63 @@ export interface Project {
   slug: string;
   title: string;
   category: string;
+  /**
+   * What the thing is, in the words someone would actually type looking
+   * for it — "AI Surveillance System", "Food Delivery Platform".
+   *
+   * `category` is written for a reader arriving on the page and already
+   * knowing roughly what they are looking at: "Edge AI — computer
+   * vision", "Interactive learning". Those are accurate and they are
+   * not search phrases. Nobody types "interactive learning" looking for
+   * a data-structure visualiser.
+   *
+   * So this is a second, narrower line, used in the <title> and as the
+   * entity's `alternateName` when it is set. Only set it where the
+   * product name alone is ambiguous — a one-word name like Netra or
+   * Saturdays that means something else in ordinary English. Where the
+   * product name is already unique and specific, `category` is fine and
+   * this stays undefined.
+   *
+   * It has to stay a true description of the thing. It is not a keyword
+   * slot, and a descriptor that oversells what was built is the same
+   * lie as an invented rating, just harder to spot.
+   */
+  descriptor?: string;
+  /**
+   * The canonical subjects this project is about, by their English
+   * Wikipedia article title — 'Computer vision', 'Verilog', 'Sensor
+   * fusion'.
+   *
+   * `keywords` is a free-text string and means nothing to a knowledge
+   * graph: anybody can type anything into it. A subject stated as a
+   * `Thing` with a `sameAs` pointing at Wikipedia is a different claim
+   * entirely, because Wikipedia articles are nodes a knowledge graph
+   * already holds. It says "this page is about THAT thing", where
+   * "that thing" is an entity the graph can resolve rather than a
+   * string it has to guess at.
+   *
+   * This is the part of the markup that is durable. Titles and
+   * descriptions get rewritten; the fact that Netra is about object
+   * detection will be true in ten years.
+   *
+   * Names must match the Wikipedia article title exactly — the URL is
+   * derived from the name in `seo.ts` and a wrong name is a link to a
+   * page that does not exist. Every one is checked by
+   * `scripts/audit-schema.mjs`.
+   */
+  topics?: string[];
+  /**
+   * The organization the work was done on behalf of, where that is not
+   * me. schema.org's `sourceOrganization` is exactly this: "the
+   * Organization on whose behalf the creator was working."
+   *
+   * It matters for more than credit. A search for "GovernAI Studio" is
+   * a search for a GovernAI product, and a page that names GovernAI as
+   * an organization with a URL is a page about that entity rather than
+   * a page that happens to contain the string. Attribution and entity
+   * grounding turn out to be the same act.
+   */
+  sourceOrganization?: { name: string; url: string; sameAs?: string[] };
   year: string;
   status: string;
   /** One line, used on the deck frame. */
@@ -375,8 +432,10 @@ export const PROJECTS: Project[] = [
   /* ── 1 ─────────────────────────────────────────────────────────── */
   {
     slug: 'saturdays',
+    topics: ['Online food ordering', 'Point of sale'],
     title: 'Saturdays',
     category: 'Consumer food delivery',
+    descriptor: 'Food Delivery Platform',
     year: '2026 — present',
     status: 'Live in production',
     summary:
@@ -465,6 +524,7 @@ export const PROJECTS: Project[] = [
   /* ── 2 ─────────────────────────────────────────────────────────── */
   {
     slug: 'dineguru',
+    topics: ['Point of sale', 'Multitenancy'],
     title: 'DineGuru',
     category: 'Multi-tenant SaaS',
     year: '2026 — present',
@@ -556,6 +616,12 @@ export const PROJECTS: Project[] = [
   /* ── 3 ─────────────────────────────────────────────────────────── */
   {
     slug: 'governai-research-atlas',
+    sourceOrganization: {
+      name: 'GovernAI',
+      url: 'https://www.governai.info/',
+      sameAs: ['https://in.linkedin.com/company/governaiofficial'],
+    },
+    topics: ['Semantic search', 'Vector database'],
     title: 'GovernAI Research Atlas',
     category: 'Semantic search',
     year: '2026',
@@ -635,6 +701,12 @@ export const PROJECTS: Project[] = [
   /* ── 4 ─────────────────────────────────────────────────────────── */
   {
     slug: 'governai-studio',
+    sourceOrganization: {
+      name: 'GovernAI',
+      url: 'https://www.governai.info/',
+      sameAs: ['https://in.linkedin.com/company/governaiofficial'],
+    },
+    topics: ['Regulation of artificial intelligence', 'Retrieval-augmented generation'],
     title: 'GovernAI Studio',
     category: 'AI governance simulator',
     year: '2026',
@@ -711,8 +783,10 @@ export const PROJECTS: Project[] = [
   /* ── 5 ─────────────────────────────────────────────────────────── */
   {
     slug: 'content-recommendation-engine',
+    topics: ['Recommender system', 'Transformer (deep learning architecture)'],
     title: 'Content Recommendation Engine',
     category: 'Deep learning — IIT Ropar capstone',
+    descriptor: 'SASRec Sequential Recommender',
     year: '2025',
     status: 'IIT Ropar capstone',
     summary:
@@ -790,8 +864,10 @@ export const PROJECTS: Project[] = [
   /* ── 6 ─────────────────────────────────────────────────────────── */
   {
     slug: 'rockfall-prediction',
+    topics: ['Rockfall', 'Sensor fusion', 'Internet of things'],
     title: 'AI & IoT Rockfall Prediction',
     category: 'Machine learning & IoT',
+    descriptor: 'Geological Hazard Detection',
     year: '2025',
     status: 'Shortlisted, SIH 2025',
     summary:
@@ -877,8 +953,10 @@ export const PROJECTS: Project[] = [
   /* ── 7 ─────────────────────────────────────────────────────────── */
   {
     slug: 'netra',
+    topics: ['Computer vision', 'Object detection', 'Edge computing'],
     title: 'Netra',
     category: 'Edge AI — computer vision',
+    descriptor: 'AI Surveillance System',
     year: '2025',
     status: 'Edge AI & computer vision',
     summary:
@@ -949,8 +1027,10 @@ export const PROJECTS: Project[] = [
   /* ── 8 ─────────────────────────────────────────────────────────── */
   {
     slug: 'algoverse',
+    topics: ['Data structure', 'Algorithm', 'Information visualization'],
     title: 'AlgoVerse',
     category: 'Interactive learning',
+    descriptor: 'Data Structure and Algorithm Visualizer',
     year: '2025',
     status: 'Interactive learning platform',
     summary:
@@ -1025,8 +1105,10 @@ export const PROJECTS: Project[] = [
   /* ── 9 ─────────────────────────────────────────────────────────── */
   {
     slug: 'smart-home-automation',
+    topics: ['Home automation', 'Natural language processing'],
     title: 'IoT Smart Home Automation',
     category: 'Voice interface & NLP',
+    descriptor: 'Voice Controlled Home Assistant',
     year: '2024',
     status: 'Top 12 of 250+ teams',
     summary:
@@ -1114,8 +1196,10 @@ export const PROJECTS: Project[] = [
   /* ── 10 ────────────────────────────────────────────────────────── */
   {
     slug: 'adaptive-traffic-controller',
+    topics: ['Verilog', 'Field-programmable gate array', 'Traffic light control and coordination'],
     title: 'Adaptive Traffic Light Controller',
     category: 'Digital systems — Verilog',
+    descriptor: 'Verilog FPGA Design',
     year: '2024',
     status: 'Digital systems / hardware',
     summary:

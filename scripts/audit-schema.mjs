@@ -31,6 +31,14 @@
                            the types this site actually publishes.
      4. References       — every { "@id": … } resolves to a node in the
                            same document.
+     5. Subjects         — every `about` node's `sameAs` is fetched, and
+                           has to be a real Wikipedia article. Those
+                           URLs are derived from a subject's name in
+                           `seo.ts` rather than stored next to it, so a
+                           name that is not exactly an article title
+                           produces a confident link to nothing. It is
+                           the one claim here that cannot be checked by
+                           reading the JSON.
 
    Reads the built export, so it tests what ships.
 
@@ -45,6 +53,9 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = path.join(ROOT, 'out');
 
 const problems = [];
+/* Subject URL -> subject name, deduped across every document. */
+const subjects = new Map();
+let subjectsOk = 0;
 const fail = (where, msg) => problems.push(`${where.padEnd(38)} ${msg}`);
 
 /** Every .html in the export, as the URL it answers. */
@@ -318,12 +329,50 @@ for (const doc of routes) {
   };
   scan(graph);
   for (const r of refs) if (!ids.has(r)) fail(doc.url, `dangling @id reference: ${r}`);
+
+  /* Every subject an `about` node claims, collected for the fetch below. */
+  for (const node of graph) {
+    for (const t of [].concat(node.about ?? [])) {
+      if (t && typeof t === 'object' && t.sameAs) subjects.set(t.sameAs, t.name ?? '');
+    }
+  }
+}
+
+/* ── Every subject resolves to a real Wikipedia article ──────────────
+   `about` with a `sameAs` is the one part of this markup that claims a
+   node in somebody else's graph, and the URL is derived from the
+   subject's name in `seo.ts` rather than stored beside it. That is the
+   right way round — one place to write a subject down — but it means a
+   name that is not exactly an article title produces a confident link
+   to a page that does not exist.
+
+   There is no way to catch that by reading the JSON. So it is fetched.
+   Wikipedia redirects freely between article titles, and a redirect is
+   a working link, so 2xx and 3xx both pass; only a 404 is a broken
+   claim. Network trouble is reported and does not fail the build,
+   because an audit that goes red when the wifi drops gets ignored. */
+if (subjects.size) {
+  const results = await Promise.all(
+    [...subjects].map(async ([url, name]) => {
+      try {
+        const res = await fetch(url, { redirect: 'manual', headers: { 'user-agent': 'divyakush-schema-audit' } });
+        return { url, name, status: res.status };
+      } catch (err) {
+        return { url, name, error: err.message };
+      }
+    }),
+  );
+  for (const r of results) {
+    if (r.error) console.log(`  (subject not checked — ${r.error}) ${r.name}`);
+    else if (r.status >= 400) fail('about/sameAs', `no such Wikipedia article: "${r.name}" -> ${r.url}`);
+    else subjectsOk++;
+  }
 }
 
 console.log(
   `\n${graphs} documents with structured data, ${breadcrumbs} carrying a breadcrumb,\n` +
     `${faqQuestions} FAQ question(s) published and checked against the page, ` +
-    `${reviews} review(s)\n`,
+    `${reviews} review(s),\n${subjectsOk}/${subjects.size} subject(s) resolving to a real Wikipedia article\n`,
 );
 
 if (problems.length) {

@@ -33,7 +33,7 @@
    subject. That is the bug all of this exists to keep fixed.
    ───────────────────────────────────────────────────────────────── */
 
-import { PROJECTS } from './projects';
+import { PROJECTS, type Project } from './projects';
 import { INSIGHTS } from './insights';
 import { CERTIFICATIONS } from './certifications';
 import { IMAGES } from './image-fallbacks.generated';
@@ -205,6 +205,17 @@ export interface RouteSeo {
   schema: Node[];
   /** Present only where the page has a photograph of its own. */
   image?: string;
+  /**
+   * A designed 1200×630 share card for this page, if one was rendered
+   * for it by `scripts/generate-og-image.mjs`.
+   *
+   * Deliberately not `image`. That one holds an insight's photograph,
+   * which is a 16:10 frame and is the exact thing `app/_seo/metadata.ts`
+   * argues must never be dropped into an og:image slot — every platform
+   * crops it differently and it reads as an accident. A card is built
+   * at 1200×630 with type set into it, so it survives the crop.
+   */
+  card?: string;
 }
 
 /* ── The graph's shared nodes ─────────────────────────────────────
@@ -480,11 +491,20 @@ const products: Node[] = PRODUCT_SLUGS.flatMap((slug) => {
   const live = (p.links ?? []).find((l) => l.kind === 'live')?.href;
   return [
     {
-      '@type': 'SoftwareApplication',
+      /* `WebApplication`, not the bare `SoftwareApplication` parent, and
+         it must match the type the project page emits at this same
+         `@id` — see the note there. `applicationCategory` was the
+         string 'WebApplication', which is a type name, not a category.
+         The category is the line the page already prints. */
+      '@type': 'WebApplication',
       '@id': `${ORIGIN}/projects/${p.slug}#app`,
       name: p.title,
+      /* Same alternate name the project page states at this `@id`. Two
+         pages describing one entity have to agree, or the `@id` is
+         doing nothing. */
+      ...(p.descriptor ? { alternateName: `${p.title} — ${p.descriptor}` } : {}),
       url: `${ORIGIN}/projects/${p.slug}`,
-      applicationCategory: 'WebApplication',
+      ...(p.category ? { applicationCategory: p.category } : {}),
       operatingSystem: 'Web',
       description: clamp(p.summary || p.lede),
       author: { '@id': `${ORIGIN}/#person` },
@@ -660,6 +680,81 @@ export const homeSeo = (): RouteSeo => ({
   ],
 });
 
+/* ── A project's <title> ────────────────────────────────────────────
+   The strongest on-page slot there is, and it used to spend all of it
+   on the project's name plus mine. For a project called "Saturdays"
+   that is close to worthless: to a search engine the word is the plural
+   of a weekday, and nothing in the title said what the thing is. The
+   same is true of every one-word product name here — "Netra" is a
+   Sanskrit word before it is a camera, "AlgoVerse" collides with an
+   unrelated research programme.
+
+   What answers it is `descriptor` where a project sets one — the words
+   somebody would actually type, 'AI Surveillance System', 'Food
+   Delivery Platform' — falling back to `category`, which is written for
+   a reader who has already arrived and is accurate rather than
+   searchable. Nobody types 'interactive learning' looking for a
+   data-structure visualiser.
+
+   Either way it goes in whenever there is room.
+
+   Room is 65 characters, which is what `scripts/seo-crawl.mjs` enforces
+   and roughly where a search result stops displaying. It is measured on
+   the ENCODED string, so an ampersand costs five characters rather than
+   one — 'AI & IoT Rockfall Prediction' is eight characters longer than
+   it looks. Two of the ten projects were over the line on that alone.
+
+   When it does not fit, the byline is what goes first. A project page
+   is found by the project's name; my name is on the H1, the breadcrumb,
+   the Person node and the footer either way. */
+/* ── A project's subjects, as resolvable entities ───────────────────
+   `about` takes Things, and a Thing with a `sameAs` pointing at its
+   English Wikipedia article is one a knowledge graph can already
+   resolve. That is the difference between telling a crawler this page
+   mentions the string "computer vision" and telling it the page is
+   about the subject Computer vision.
+
+   The URL is derived from the name rather than stored beside it, so
+   there is exactly one place a subject is written down and no way for
+   the two to disagree. Wikipedia's own URL rule is spaces to
+   underscores and nothing else — the parentheses in
+   'Transformer (deep learning architecture)' are literal, and
+   encoding them breaks the link.
+
+   `audit-schema.mjs` fetches every one of these, so a name that does
+   not match an article title fails the build rather than shipping a
+   link to a page that does not exist. */
+const wikipedia = (name: string) =>
+  `https://en.wikipedia.org/wiki/${name.replace(/ /g, '_')}`;
+
+function topicNodes(p: Project) {
+  if (!p.topics?.length) return {};
+  return {
+    about: p.topics.map((name) => ({
+      '@type': 'Thing',
+      name,
+      sameAs: wikipedia(name),
+    })),
+  };
+}
+
+function projectTitle(p: Project): string {
+  const encoded = (s: string) => s.replace(/&/g, '&amp;').length;
+  const what = p.descriptor ?? p.category;
+  const candidates = what
+    ? [
+        `${p.title} — ${what} · ${NAME}`,
+        `${p.title} — ${what}`,
+        /* A descriptor is the reason this page is findable at all, so it
+           outranks the category on the way down. Only when neither fits
+           does the title fall back to the bare name. */
+        ...(p.descriptor && p.category ? [`${p.title} — ${p.category}`] : []),
+        `${p.title} · ${NAME}`,
+      ]
+    : [`${p.title} · ${NAME}`];
+  return candidates.find((c) => encoded(c) <= 65) ?? p.title;
+}
+
 export function projectSeo(slug: string): RouteSeo | null {
   const p = PROJECTS.find((x) => x.slug === slug);
   if (!p) return null;
@@ -668,9 +763,31 @@ export function projectSeo(slug: string): RouteSeo | null {
   const live = (p.links ?? []).find((l) => l.kind === 'live')?.href;
   const url = `/projects/${p.slug}`;
 
+  /* `year` is display copy — '2026 — present'. `dateCreated` is a
+     schema.org Date and has to parse as ISO 8601, so a value with an
+     em-dash and a word in it is not a date and gets dropped without a
+     warning. Take the year out of it. */
+  const created = /\b(\d{4})\b/.exec(p.year ?? '')?.[1];
+
+  /* `stack` is the toolchain the page prints for a reader, and only
+     part of it is a programming language. Saturdays lists React,
+     TypeScript, Django, PostgreSQL, Celery and PhonePe — a library, a
+     language, a framework, a database, a task queue and a payment
+     provider. All six were being published as `programmingLanguage`,
+     which is a field a parser reads literally, so five of them were a
+     false statement. The whole stack still ships as `keywords`, which
+     is the field that is actually for this. */
+  const LANGUAGES = new Set([
+    'TypeScript', 'JavaScript', 'Python', 'C', 'C++', 'Java', 'Go',
+    'Rust', 'Verilog', 'VHDL', 'SQL', 'Dart', 'Kotlin', 'Swift', 'R',
+  ]);
+  const languages = (p.stack ?? []).filter((t) => LANGUAGES.has(t));
+
   return {
     url,
-    title: `${p.title} — ${NAME}`,
+    title: projectTitle(p),
+    /* Rendered by `scripts/generate-og-image.mjs`, one per project. */
+    card: `/og/${p.slug}.png`,
     description: clamp(p.summary || p.lede),
     h1: p.title,
     /* The real prose, not just the summary. A project page carries its
@@ -689,7 +806,7 @@ export function projectSeo(slug: string): RouteSeo | null {
       website,
       webPage(url, p.title, clamp(p.summary || p.lede), {
         breadcrumb: { '@id': `${ORIGIN}${url}#breadcrumb` },
-        mainEntity: { '@id': `${ORIGIN}${url}#software` },
+        mainEntity: { '@id': `${ORIGIN}${url}#app` },
       }),
       /* Mirrors the trail the page renders — "Selected work /
          <category>" above the H1 — as far as breadcrumb markup is
@@ -727,13 +844,64 @@ export function projectSeo(slug: string): RouteSeo | null {
           { '@type': 'ListItem', position: 2, name: p.title, item: `${ORIGIN}${url}` },
         ],
       },
+      /* ── The product ────────────────────────────────────────────────
+         This node and the one the home page emits for the same project
+         now carry the same `@id` and the same `@type`. They did not.
+         The home page described Saturdays as a `SoftwareApplication` at
+         `…/saturdays#app`; this page described it as a
+         `SoftwareSourceCode` at `…/saturdays#software`. Two ids and two
+         types for one thing is two entities as far as a knowledge graph
+         is concerned, and the evidence for the project was being split
+         across them — the same consolidation mistake as serving a site
+         on two hostnames, one layer up and much harder to notice.
+
+         `WebApplication` rather than `SoftwareSourceCode` because these
+         are deployed products people use, not published source.
+         `SoftwareSourceCode` describes code, and it is the right type
+         for exactly one thing here: the repository, which now gets its
+         own node below and points at this one. */
       {
-        '@type': 'SoftwareSourceCode',
-        '@id': `${ORIGIN}${url}#software`,
+        '@type': 'WebApplication',
+        '@id': `${ORIGIN}${url}#app`,
         name: p.title,
+        /* The fuller form of the name, for the projects whose bare name
+           is ambiguous. "Netra" is a Sanskrit word and several
+           companies; "Netra — AI Surveillance System" is one thing.
+           This is the same job `alternateName` does for the Person node,
+           where it carries the mononym. */
+        ...(p.descriptor ? { alternateName: `${p.title} — ${p.descriptor}` } : {}),
         description: clamp(p.lede || p.summary, 400),
         url: `${ORIGIN}${url}`,
         author: { '@id': `${ORIGIN}/#person` },
+        operatingSystem: 'Web',
+        /* What this project is ABOUT, as entities rather than as a
+           string. `keywords` is free text and worth close to nothing to
+           a knowledge graph — anyone can type anything into it. A
+           subject stated as a Thing with a `sameAs` pointing at
+           Wikipedia is a claim the graph can resolve against a node it
+           already holds.
+
+           This is also the most durable thing on the page. The title
+           will be rewritten; Netra will still be about object
+           detection in ten years. */
+        ...topicNodes(p),
+        /* Who the work was done for, where that is not me. A search for
+           "GovernAI Studio" is a search for a GovernAI product, and
+           naming the organization as an entity with a URL is what makes
+           this page about that thing rather than a page that merely
+           contains the words. It is also just the truthful credit. */
+        ...(p.sourceOrganization
+          ? {
+              sourceOrganization: {
+                '@type': 'Organization',
+                name: p.sourceOrganization.name,
+                url: p.sourceOrganization.url,
+                ...(p.sourceOrganization.sameAs?.length
+                  ? { sameAs: p.sourceOrganization.sameAs }
+                  : {}),
+              },
+            }
+          : {}),
         /* The category the page prints above the title — "Multi-tenant
            SaaS", "Edge AI — computer vision". It is the one line that
            says what *kind* of thing this is, and it was only in the
@@ -753,10 +921,12 @@ export function projectSeo(slug: string): RouteSeo | null {
           ? { screenshot: p.gallery.filter((g) => g.kind === 'product').map((g) => `${ORIGIN}${g.src}`) }
           : {}),
         ...(p.stack?.length ? { keywords: p.stack.join(', ') } : {}),
-        ...(repo ? { codeRepository: repo } : {}),
-        ...(live ? { targetProduct: { '@type': 'WebApplication', url: live } } : {}),
-        ...(p.stack?.length ? { programmingLanguage: p.stack } : {}),
-        ...(p.year ? { dateCreated: String(p.year) } : {}),
+        /* The live product, as an identity claim rather than a
+           subordinate node. `sameAs` is what the home page already used
+           for this, and saying it the same way in both places is the
+           point of the shared `@id`. */
+        ...(live ? { sameAs: live } : {}),
+        ...(created ? { dateCreated: created } : {}),
         /* Where the work was done. Every project on this site was built
            in India, and eight of the ten on the VIT Vellore campus —
            which is a true statement about the work and the only kind of
@@ -766,6 +936,31 @@ export function projectSeo(slug: string): RouteSeo | null {
         countryOfOrigin: { '@type': 'Country', name: 'India' },
         isPartOf: { '@id': `${ORIGIN}/#website` },
       },
+      /* ── The repository, when there is a public one ──────────────────
+         This is what `SoftwareSourceCode` is for, and it points at the
+         product rather than claiming to be it. Projects with no public
+         repo emit nothing here, which is the difference between an
+         absent claim and a false one.
+
+         `programmingLanguage` lives here and is filtered to actual
+         languages. It previously carried the whole `stack` array on the
+         product node, which for Saturdays meant publishing PostgreSQL,
+         Celery and PhonePe as programming languages. */
+      ...(repo
+        ? [
+            {
+              '@type': 'SoftwareSourceCode',
+              '@id': `${ORIGIN}${url}#source`,
+              name: `${p.title} — source`,
+              codeRepository: repo,
+              targetProduct: { '@id': `${ORIGIN}${url}#app` },
+              author: { '@id': `${ORIGIN}/#person` },
+              ...(languages.length ? { programmingLanguage: languages } : {}),
+              ...(created ? { dateCreated: created } : {}),
+              isPartOf: { '@id': `${ORIGIN}/#website` },
+            },
+          ]
+        : []),
     ],
   };
 }

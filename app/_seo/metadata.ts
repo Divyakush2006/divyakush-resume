@@ -17,13 +17,21 @@ import { NAME, ROLE, type RouteSeo } from '../../src/lib/seo';
    a duplicate of the URL it names, and twenty-two of these documents
    once named the home page.
 
-   The share image is the same file everywhere on purpose. A project
-   page could plausibly use its own cover, and the reason it does not
-   is that og:image is a 1200x630 card with type set into it — a raw
-   16:10 screenshot dropped into that slot gets cropped by every
-   platform differently and reads as an accident. One designed card
-   that names the person is the better unfurl, and it is the same card
-   the JSON-LD points at as the entity's image.
+   The share image is a designed 1200x630 card with type set into it,
+   never a page's own photograph or screenshot — a raw 16:10 frame
+   dropped into that slot gets cropped by every platform differently
+   and reads as an accident.
+
+   For a long time that meant one card everywhere. The argument was
+   right about screenshots and wrong about the conclusion, because a
+   screenshot was never the only alternative to the site card: a card
+   can be *generated* per page. `scripts/generate-og-image.mjs` now
+   renders one per project on the same surface, so a link to Netra
+   unfurls as Netra and a project's search thumbnail says what the
+   project is, instead of ten results repeating the same byline.
+
+   Anything without its own card falls back to the site card, which is
+   still what the JSON-LD points at as the entity's image.
    ───────────────────────────────────────────────────────────────── */
 
 const OG_IMAGE = {
@@ -34,6 +42,9 @@ const OG_IMAGE = {
 };
 
 export function metadataFor(seo: RouteSeo, type: 'website' | 'article'): Metadata {
+  const card = seo.card
+    ? { url: seo.card, width: 1200, height: 630, alt: `${seo.h1} — ${NAME}` }
+    : OG_IMAGE;
   return {
     title: seo.title,
     description: seo.description,
@@ -54,13 +65,13 @@ export function metadataFor(seo: RouteSeo, type: 'website' | 'article'): Metadat
       title: seo.title,
       description: seo.description,
       locale: 'en',
-      images: [OG_IMAGE],
+      images: [card],
     },
     twitter: {
       card: 'summary_large_image',
       title: seo.title,
       description: seo.description,
-      images: [OG_IMAGE.url],
+      images: [card.url],
     },
   };
 }
