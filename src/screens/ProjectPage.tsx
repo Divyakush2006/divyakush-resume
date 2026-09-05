@@ -413,12 +413,24 @@ function Hero({ project }: { project: Project }) {
           transition={{ duration: 0.7, delay: 0.44, ease: EASE_OUT }}
           className="mt-8 flex flex-wrap items-center gap-2.5 sm:mt-10 sm:gap-3"
         >
+          {/* `nofollow` on the outbound project links.
+
+              These pointed at saturdays.co.in and dineguru.in as ordinary
+              dofollow links, which meant each case study was passing ranking
+              signal to the product it is a write-up of. For Saturdays that is
+              actively self-defeating: this page and that site answer the same
+              query, and this page was endorsing the other one.
+
+              The link stays exactly as it was for a reader — visible, in the
+              hero, first thing you can click. `nofollow` only tells a search
+              engine not to treat it as a vote. Attribution and endorsement are
+              different things and this is the attribute that separates them. */}
           {project.links.map((link) => (
             <a
               key={link.href}
               href={link.href}
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener noreferrer nofollow"
               className={`group inline-flex items-center gap-2.5 rounded-full px-6 py-3.5 font-mono text-meta-sm font-bold uppercase transition-colors duration-200 ${
                 link.kind === 'live'
                   ? 'bg-accent text-ink hover:bg-white'
