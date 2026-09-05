@@ -526,7 +526,19 @@ const products: Node[] = PRODUCT_SLUGS.flatMap((slug) => {
       description: clamp(p.summary || p.lede),
       author: { '@id': `${ORIGIN}/#person` },
       ...(p.stack?.length ? { keywords: p.stack.join(', ') } : {}),
-      ...(live ? { sameAs: live } : {}),
+      /* No `sameAs` to the product's own domain.
+
+         `sameAs` on a WebApplication says "this entity is also at that URL",
+         which invites a consumer to treat the case study and the product site
+         as one thing and prefer whichever it considers canonical — the
+         product's own domain, every time. For Saturdays that is the page this
+         one has to outrank on the same query, so the markup was arguing
+         against the page carrying it.
+
+         The live product is still linked from the page, visibly, in the hero.
+         That link is `nofollow` (src/screens/ProjectPage.tsx) for the same
+         reason. Declining to state an optional relation is not a false
+         statement. */
     },
   ];
 });
@@ -914,13 +926,14 @@ export function projectSeo(slug: string): RouteSeo | null {
            contains the words. It is also just the truthful credit. */
         ...(p.sourceOrganization
           ? {
+              /* Name only. The credit is true and worth stating; the
+                 organisation's URL is not published here, because
+                 governai.info competes with these pages for the products'
+                 own names and this markup is not the place to hand it an
+                 entity reference. */
               sourceOrganization: {
                 '@type': 'Organization',
                 name: p.sourceOrganization.name,
-                url: p.sourceOrganization.url,
-                ...(p.sourceOrganization.sameAs?.length
-                  ? { sameAs: p.sourceOrganization.sameAs }
-                  : {}),
               },
             }
           : {}),
@@ -947,7 +960,19 @@ export function projectSeo(slug: string): RouteSeo | null {
            subordinate node. `sameAs` is what the home page already used
            for this, and saying it the same way in both places is the
            point of the shared `@id`. */
-        ...(live ? { sameAs: live } : {}),
+        /* No `sameAs` to the product's own domain.
+
+           `sameAs` on a WebApplication says "this entity is also at that URL",
+           which invites a consumer to treat the case study and the product site
+           as one thing and prefer whichever it considers canonical — the
+           product's own domain, every time. For Saturdays that is the page this
+           one has to outrank on the same query, so the markup was arguing
+           against the page carrying it.
+
+           The live product is still linked from the page, visibly, in the hero.
+           That link is `nofollow` (src/screens/ProjectPage.tsx) for the same
+           reason. Declining to state an optional relation is not a false
+           statement. */
         ...(created ? { dateCreated: created } : {}),
         /* Where the work was done. Every project on this site was built
            in India, and eight of the ten on the VIT Vellore campus —
