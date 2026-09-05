@@ -527,6 +527,7 @@ export const PROJECTS: Project[] = [
     topics: ['Point of sale', 'Multitenancy'],
     title: 'DineGuru',
     category: 'Multi-tenant SaaS',
+    descriptor: 'Restaurant POS and Billing System',
     year: '2026 — present',
     status: 'Live in production',
     summary:
