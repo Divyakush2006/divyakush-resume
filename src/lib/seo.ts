@@ -192,6 +192,9 @@ export function isoRange(printed: string | undefined): { start?: string; end?: s
 
 type Node = Record<string, unknown>;
 
+/** A paragraph, or a section heading, in a page's crawlable prose. */
+export type Block = string | { heading: string };
+
 export interface RouteSeo {
   /** Path, always absolute and without a trailing slash except '/'. */
   url: string;
@@ -199,8 +202,22 @@ export interface RouteSeo {
   description: string;
   /** The heading a crawler without JavaScript should read first. */
   h1: string;
-  /** The page's actual prose, in order. */
-  body: string[];
+  /**
+   * The page's actual prose, in order.
+   *
+   * A plain string is a paragraph. `{ heading }` is a section title and
+   * renders as an `<h2>`.
+   *
+   * It was `string[]`, which meant every section title on a project page
+   * — "Live order tracking", "Server-side truth for anything that
+   * matters" — was published as a paragraph indistinguishable from body
+   * copy. A crawler saw a 989-word document whose only headings were the
+   * site's own footer sections, while the rendered page showed a proper
+   * hierarchy. The crawlable version was under-representing the real
+   * page, and headings are one of the clearer structural signals a
+   * document has.
+   */
+  body: Block[];
   /** JSON-LD nodes, assembled into one @graph. */
   schema: Node[];
   /** Present only where the page has a photograph of its own. */
@@ -793,13 +810,18 @@ export function projectSeo(slug: string): RouteSeo | null {
     /* The real prose, not just the summary. A project page carries its
        build notes and feature write-ups, and those are the words that
        make it rank for anything beyond the project's own name. */
+    /* Section titles are headings, because on the rendered page that is
+       exactly what they are. Publishing them as paragraphs gave the
+       crawlable document a thousand words under a single h1, which
+       describes the page far less accurately than the page describes
+       itself. */
     body: [
       p.lede,
       p.summary,
-      ...(p.build ?? []).flatMap((b) => [b.title, b.body]),
-      ...(p.features ?? []).flatMap((f) => [f.title, f.body]),
+      ...(p.build ?? []).flatMap((b) => [{ heading: b.title }, b.body]),
+      ...(p.features ?? []).flatMap((f) => [{ heading: f.title }, f.body]),
       ...(p.facts ?? []).map((f) => `${f.label}: ${f.value}`),
-    ].filter(Boolean) as string[],
+    ].filter(Boolean) as Block[],
     schema: [
       person,
       logo,

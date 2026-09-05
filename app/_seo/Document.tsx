@@ -50,9 +50,16 @@ export function NoscriptProse({ seo }: { seo: RouteSeo }) {
   return (
     <noscript>
       <h1>{seo.h1}</h1>
-      {seo.body.map((p, i) => (
-        <p key={i}>{p}</p>
-      ))}
+      {/* A section title renders as a heading, because that is what it is
+          on the rendered page. Flattening them all to <p> published a
+          thousand-word document with no structure below the h1. */}
+      {seo.body.map((block, i) =>
+        typeof block === 'string' ? (
+          <p key={i}>{block}</p>
+        ) : (
+          <h2 key={i}>{block.heading}</h2>
+        ),
+      )}
 
       {/* ── The site's link graph, for readers that never run the
              bundle ────────────────────────────────────────────────
@@ -92,9 +99,22 @@ export function NoscriptProse({ seo }: { seo: RouteSeo }) {
       <nav>
         <h2>Selected work</h2>
         <ul>
+          {/* The anchor carries the descriptor where a project has one.
+              It said "Saturdays" — a bare word that means a day of the
+              week — on all twenty-three documents, which is the single
+              most repeated anchor text on the site and the one with the
+              least information in it. "Saturdays — Food Delivery
+              Platform" is the same link, is the entity's own
+              `alternateName`, and actually says what is at the other
+              end. Anchor text is the oldest ranking input there is and
+              this was spending every internal instance of it on a
+              weekday. */}
           {PROJECTS.map((p) => (
             <li key={p.slug}>
-              <a href={`${ORIGIN}/projects/${p.slug}`}>{p.title}</a> — {p.summary}
+              <a href={`${ORIGIN}/projects/${p.slug}`}>
+                {p.descriptor ? `${p.title} — ${p.descriptor}` : p.title}
+              </a>{' '}
+              — {p.summary}
             </li>
           ))}
         </ul>
