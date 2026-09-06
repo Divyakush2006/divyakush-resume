@@ -11,6 +11,7 @@ import { ArrowRight } from 'lucide-react';
 import { EASE_OUT } from '../lib/motion';
 import { PROJECTS, type Project } from '../lib/projects';
 import { MotionPicture } from './Picture';
+import { contentImage } from '../lib/image-loading';
 import { useMediaQuery } from '../lib/useMediaQuery';
 import { WorksListMobile } from './WorksListMobile';
 
@@ -619,8 +620,7 @@ function ProjectFrame({
           sizes="(min-width: 1024px) 55vw, 100vw"
           src={project.cover}
           alt={`${project.title} — ${project.category}`}
-          loading="lazy"
-          decoding="async"
+          {...contentImage()}
           style={{ scale: imgScale }}
           className="h-full w-full object-cover object-center transition-transform duration-[1200ms] ease-out group-hover:scale-[1.03]"
         />

@@ -13,6 +13,7 @@ import { EASE_OUT, viewportOnce } from '../lib/motion';
 import _avatar from '../assets/hero-no-bg.webp';
 
 import { Picture } from './Picture';
+import { contentImage } from '../lib/image-loading';
 
 /* Vite resolved these imports to URL strings; Next resolves them to
    StaticImageData objects. `asset()` is the single boundary where that
@@ -291,8 +292,7 @@ function Conversation({ phase, reduced }: { phase: Phase; reduced: boolean }) {
           alt=""
           width={48}
           height={48}
-          loading="lazy"
-          decoding="async"
+          {...contentImage()}
           className="h-full w-full object-cover object-top"
         />
       </span>

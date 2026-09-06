@@ -9,6 +9,7 @@ import { InsightStory } from './InsightStory';
 import { INSIGHTS } from '../lib/insights';
 import { INSIGHT_PREFIX } from '../lib/seo';
 import { Picture } from './Picture';
+import { contentImage } from '../lib/image-loading';
 import { useMediaQuery } from '../lib/useMediaQuery';
 
 /* ─────────────────────────────────────────────────────────────────
@@ -512,8 +513,17 @@ export function InsightsCarousel() {
                      mechanism for the same goal that only ever had the
                      side effect. */
                   alt={`${item.title}${item.location ? `, ${item.location}` : ''}`}
-                  loading={Math.abs(d) <= 1 ? 'eager' : 'lazy'}
-                  decoding="async"
+                  /* The far slides follow the site-wide policy: fetched
+                     at page start, at low priority, so a swipe never
+                     lands on an empty frame. The active card and its two
+                     neighbours are what the reader is looking at right
+                     now, so they keep the normal priority they have
+                     always had — and stay eager even on Save-Data, where
+                     the policy defers everything else. */
+                  {...contentImage()}
+                  {...(Math.abs(d) <= 1
+                    ? { loading: 'eager' as const, fetchPriority: 'auto' as const }
+                    : {})}
                   draggable={false}
                   ref={(el) => {
                     /* A cached file is already decoded by the time the

@@ -16,6 +16,7 @@ import { useScrollLock } from '../lib/scroll-lock';
 import { EASE_OUT, viewportOnce } from '../lib/motion';
 import { CERTIFICATIONS, CERT_TRACKS, type Certification } from '../lib/certifications';
 import { Picture } from './Picture';
+import { contentImage } from '../lib/image-loading';
 
 /* ─────────────────────────────────────────────────────────────────
    Certifications.
@@ -186,8 +187,7 @@ function CertCard({ cert, index, reduced, onOpen }: CardProps) {
               sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw"
               src={cert.image}
               alt={`${cert.title} certificate issued by ${cert.issuer}`}
-              loading="lazy"
-              decoding="async"
+              {...contentImage()}
               width={1414}
               height={1000}
               className="block aspect-[1414/1000] w-full object-contain grayscale transition-[filter] duration-500 ease-out group-hover:grayscale-0 group-focus-visible:grayscale-0"

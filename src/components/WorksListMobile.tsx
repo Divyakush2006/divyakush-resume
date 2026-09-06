@@ -5,6 +5,7 @@ import { ArrowRight } from 'lucide-react';
 import { SectionHeader } from './primitives';
 import { PROJECTS } from '../lib/projects';
 import { Picture } from './Picture';
+import { contentImage } from '../lib/image-loading';
 
 /* ─────────────────────────────────────────────────────────────────
    Selected work, on a phone: a list.
@@ -78,8 +79,7 @@ export function WorksListMobile() {
                   <Picture
                     src={project.cover}
                     alt={`${project.title} — ${project.category}`}
-                    loading="lazy"
-                    decoding="async"
+                    {...contentImage()}
                     sizes="100vw"
                     className="block aspect-[16/10] w-full object-cover object-center"
                   />

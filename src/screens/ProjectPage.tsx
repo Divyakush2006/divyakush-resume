@@ -22,6 +22,7 @@ import { getProject, neighbours, type GalleryItem, type Project } from '../lib/p
 import { EASE_OUT, viewportOnce } from '../lib/motion';
 import { NotFound } from './NotFound';
 import { Picture, MotionPicture } from '../components/Picture';
+import { contentImage } from '../lib/image-loading';
 import { useMediaQuery } from '../lib/useMediaQuery';
 
 /* ─────────────────────────────────────────────────────────────────
@@ -289,11 +290,19 @@ function Hero({ project }: { project: Project }) {
       className="relative flex min-h-[86svh] flex-col justify-end overflow-hidden bg-ink pt-[var(--nav-h)]"
     >
       <motion.div style={{ y: imgY, scale: imgScale }} className="absolute inset-0">
+        {/* The Largest Contentful Paint element on every project page,
+            and the only image here that is urgent. Everything else on
+            the page now downloads at page start too (see
+            src/lib/image-loading.ts), so this has to say out loud that
+            it goes first — without `high` it would be one of six
+            equal-priority requests and the reader would watch the one
+            picture that matters queue behind five it cannot see. */}
         <Picture
           sizes="100vw"
           src={project.cover}
           alt={`${project.title} — ${project.category}`}
           className="h-full w-full object-cover object-center"
+          fetchPriority="high"
           decoding="async"
         />
 
@@ -750,8 +759,7 @@ function Gallery({
                     sizes="(min-width: 640px) 48vw, 95vw"
                     src={item.src}
                     alt={item.caption}
-                    loading="lazy"
-                    decoding="async"
+                    {...contentImage()}
                     className="aspect-[16/10] w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.02]"
                   />
                 </button>
@@ -941,8 +949,7 @@ function Pager({ slug }: { slug: string }) {
               sizes="100vw"
               src={next.cover}
               alt={`${next.title} — ${next.category}`}
-              loading="lazy"
-              decoding="async"
+              {...contentImage()}
               className="h-full w-full object-cover object-center opacity-25 transition-all duration-[1400ms] ease-out group-hover:scale-105 group-hover:opacity-40"
             />
           </div>

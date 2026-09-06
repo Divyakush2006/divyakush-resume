@@ -12,6 +12,7 @@ import _compEy from '../assets/comp_ey.webp';
 import _compDevjams from '../assets/comp_devjams.webp';
 
 import { Picture } from './Picture';
+import { contentImage } from '../lib/image-loading';
 
 /* Vite resolved these imports to URL strings; Next resolves them to
    StaticImageData objects. `asset()` is the single boundary where that
@@ -260,8 +261,7 @@ function CardFace({ item, state }: { item: Competition; state: FaceState }) {
         sizes="(min-width: 1024px) 30vw, 80vw"
         src={item.image}
         alt=""
-        loading="lazy"
-        decoding="async"
+        {...contentImage()}
         className={`absolute inset-0 h-full w-full object-cover transition-[filter,transform] duration-500 ease-out ${FACE_IMAGE[state]}`}
       />
       <span
