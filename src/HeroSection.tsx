@@ -3,7 +3,6 @@ import React from 'react';
 import { motion, useScroll, useTransform, useMotionTemplate, useMotionValue, animate } from 'motion/react';
 import _heroPhoto from './assets/hero-no-bg.webp';
 
-import { PROFILE } from './lib/content';
 import { useIntroSequence } from './lib/useIntroSequence';
 import { Picture } from './components/Picture';
 import { useMediaQuery } from './lib/useMediaQuery';
@@ -397,9 +396,13 @@ export function HeroSection() {
         transition={instant ? { duration: 0 } : { duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
         style={{ zIndex: lettersLanded ? 10 : 25 }}
       >
-        <h1 className="sr-only">
-          {PROFILE.name} — {PROFILE.role}
-        </h1>
+        {/* The page's <h1> used to live here, sr-only, because the
+            wordmark beside it is an SVG and carries no text. It now
+            ships in the document itself — app/_seo/Document.tsx,
+            `PageHeading` — so that a crawler finds it without running
+            the bundle. Removed rather than duplicated: two h1s saying
+            the same thing is a heading a screen reader announces
+            twice, and scripts/audit-site.mjs asserts exactly one. */}
 
         <motion.div
           className="h-full w-full overflow-visible"

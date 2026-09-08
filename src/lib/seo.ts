@@ -818,7 +818,13 @@ export function projectSeo(slug: string): RouteSeo | null {
     /* Rendered by `scripts/generate-og-image.mjs`, one per project. */
     card: `/og/${p.slug}.png`,
     description: clamp(p.summary || p.lede),
-    h1: p.title,
+    /* Title and descriptor, not the bare title — the same string the
+       entity carries as `alternateName` and the same one the internal
+       anchors use. The visible hero says "Saturdays"; the document is
+       called "Saturdays — Food Delivery Platform", which is what the
+       page is actually about and what someone would type. A bare
+       "Saturdays" is a day of the week. */
+    h1: p.descriptor ? `${p.title} — ${p.descriptor}` : p.title,
     /* The real prose, not just the summary. A project page carries its
        build notes and feature write-ups, and those are the words that
        make it rank for anything beyond the project's own name. */

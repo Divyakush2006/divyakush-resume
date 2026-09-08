@@ -394,7 +394,23 @@ function Hero({ project }: { project: Project }) {
           <span className="text-bone-raised/80">{project.category}</span>
         </motion.nav>
 
-        <h1 className="max-w-[15ch] text-balance font-display text-display-xl font-bold leading-[0.9] text-bone-raised">
+        {/* An <h2>, and the tag is the only thing that changed — the
+            classes, the mask and the rise are untouched, so this is the
+            same display type it has always been.
+
+            The document's <h1> now ships in the HTML rather than being
+            rendered here (app/_seo/Document.tsx, `PageHeading`), which
+            is what a crawler that does not execute the bundle can
+            actually read. Leaving this one an h1 as well would put two
+            in the document: scripts/audit-site.mjs fails that, and a
+            screen reader would announce the project name twice over.
+
+            The outline it leaves is the honest one. The h1 names the
+            document — "Saturdays — Food Delivery Platform", title and
+            descriptor, the same string the entity carries as its
+            `alternateName`. This is the hero's headline, and the
+            chapters below are h2s beside it. */}
+        <h2 className="max-w-[15ch] text-balance font-display text-display-xl font-bold leading-[0.9] text-bone-raised">
           <span className="block overflow-hidden pb-[0.08em]">
             <motion.span
               className="block"
@@ -405,7 +421,7 @@ function Hero({ project }: { project: Project }) {
               {project.title}
             </motion.span>
           </span>
-        </h1>
+        </h2>
 
         <motion.p
           initial={{ opacity: 0, y: 22 }}

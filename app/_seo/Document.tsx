@@ -49,7 +49,9 @@ export function JsonLd({ schema }: { schema: RouteSeo['schema'] }) {
 export function NoscriptProse({ seo }: { seo: RouteSeo }) {
   return (
     <noscript>
-      <h1>{seo.h1}</h1>
+      {/* No <h1> here. It moved out of this block and into
+          `PageHeading` below — see the note there for why a heading
+          inside <noscript> is a heading most crawlers cannot count. */}
       {/* A section title renders as a heading, because that is what it is
           on the rendered page. Flattening them all to <p> published a
           thousand-word document with no structure below the h1. */}
@@ -154,6 +156,40 @@ export function NoscriptProse({ seo }: { seo: RouteSeo }) {
   );
 }
 
+/* The document's heading, in the document.
+
+   Bing Webmaster Tools reported "H1 tag missing" on the home page, and
+   it was reading the file correctly. There was exactly one <h1> in
+   out/index.html and it sat inside the <noscript> block above.
+
+   That is not a heading as far as a parser is concerned. When scripting
+   is enabled a browser tokenises everything between <noscript> and
+   </noscript> as raw text — the h1 never becomes an element, never
+   enters the DOM, and never appears in the document outline. The tag
+   was only ever a heading for the readers that do not run scripts, and
+   a static SEO analyser is not one of those: it parses the markup as a
+   scripting-enabled agent would, finds the text inert, and reports what
+   it sees.
+
+   The application does render an <h1>, but it renders it in the
+   browser, and this site's documents ship no markup at all until the
+   bundle executes (see app/_components/AppShell.tsx). So a reader that
+   does not run JavaScript found a heading it could not count, and a
+   reader that does had to wait for 1.1 MB of script to find one at all.
+
+   One <h1>, in the served HTML, outside <noscript>, on every route
+   fixes both. `sr-only` because the visible page already presents its
+   own title in its own type — this is the same string, said once, in
+   the place the document outline is actually built from. It is the
+   pattern HeroSection was already using for exactly this reason; that
+   copy is gone now, because this one replaces it.
+
+   Rendered before <noscript> and before <AppShell/>, so it is the first
+   heading in source order as well as the only one. */
+export function PageHeading({ seo }: { seo: RouteSeo }) {
+  return <h1 className="sr-only">{seo.h1}</h1>;
+}
+
 /* The two self-hosted faces, asked for immediately.
 
    A @font-face URL is not discovered until the stylesheet referencing
@@ -239,6 +275,7 @@ export function SeoDocument({ seo, hero = false }: { seo: RouteSeo; hero?: boole
       {seo.url === '/' && <HomeCanonical />}
       {hero && <HeroPreload />}
       <JsonLd schema={seo.schema} />
+      <PageHeading seo={seo} />
       <NoscriptProse seo={seo} />
     </>
   );
