@@ -79,7 +79,24 @@ export const FAQ: FaqEntry[] = [
          asking "Who is Divyakush?" alongside this one would be a
          near-duplicate of an answer already on the page, which is the
          pattern that reads as stuffing rather than as an answer. */
-      'Divyakush Punjabi — known simply as Divyakush — is a full stack and AI systems engineer based ' +
+      /* The spaced romanisation is named here for the same reason the
+         mononym is, and with the same restraint: once, as a fact.
+
+         It was already asserted in `ALTERNATE_NAMES`, and until now
+         that assertion had nothing behind it — the string "Divya Kush"
+         appeared in zero words of prose anywhere on this site. A name
+         variant declared only in structured data is a claim with no
+         corroboration on the page it describes, and the page is where
+         corroboration is looked for.
+
+         It earns the sentence because the query is genuinely ambiguous
+         rather than merely mistyped: searching the spaced form returns
+         several real engineers named Divya Punjabi. This does not take
+         that query from them, and nothing would. It makes this person
+         findable under a rendering of his own name, which is the most
+         the page can honestly do. */
+      'Divyakush Punjabi — known simply as Divyakush, and romanised Divya Kush Punjabi where the ' +
+        'name is written as two words — is a full stack and AI systems engineer based ' +
         'in Vellore, Tamil Nadu, India. ' +
         'He led engineering at LMX Labs as Software Engineering Lead, where he shipped two platforms that ' +
         'run in production, and built the retrieval side of GovernAI’s open-source research tooling.',

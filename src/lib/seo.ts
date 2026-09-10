@@ -93,8 +93,38 @@ export const ROLE = 'Full Stack & AI Systems Engineer';
         because no real entity has nine spellings.
 
    If a variant genuinely becomes a name he is known by — a byline, a
-   handle, a legal rendering — it belongs here. A typo does not. */
-export const ALTERNATE_NAMES = ['Divyakush', 'Divya Kush Punjabi'];
+   handle, a legal rendering — it belongs here. A typo does not.
+
+   ── Measured, September 2026 ──────────────────────────────────────
+   The variants were then actually searched, rather than reasoned
+   about, and they do not behave as one class. Three do different
+   things and only one of them is answerable here:
+
+     · **Typos** — `divyakush panjabi`, `divyaksh punjabi`. The engine
+       corrects them before ranking: `divyakush panjabi` returned this
+       person's own pages, spelled correctly, without the string
+       appearing anywhere. Confirms point 2 above. Nothing to add.
+
+     · **The spaced romanisation** — `divya kush punjabi` returns
+       *other people*: several real engineers named Divya Punjabi, with
+       profiles of their own. That is not a misspelling being corrected,
+       it is a different name that happens to collide, and no amount of
+       markup takes a query off a real person who owns it. What can be
+       done is make sure the entity is legible under that rendering,
+       which is what `alternateName` is for and why the spaced form was
+       already here.
+
+     · **The bare mononym** — `divyakush` is contested by Divyakush
+       Constructions, a firm with a domain and a content library. Also
+       a real entity, also not a spelling problem.
+
+   `Divya Kush` joins the list on the same argument that admitted
+   `Divya Kush Punjabi`: it is the mononym under the two-word
+   romanisation, exactly as `Divyakush` is the mononym under the
+   one-word one. Three renderings, each a way the name is actually
+   written. It stops there — the next entry would be a typo, and the
+   section above explains what that costs. */
+export const ALTERNATE_NAMES = ['Divyakush', 'Divya Kush Punjabi', 'Divya Kush'];
 
 /* Every identity URL under the author's control. Repeated byte for
    byte here, in the JSON-LD and on the profiles themselves — entity
