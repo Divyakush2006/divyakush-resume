@@ -829,17 +829,20 @@ function topicNodes(p: Project) {
 function projectTitle(p: Project): string {
   const encoded = (s: string) => s.replace(/&/g, '&amp;').length;
   const what = p.descriptor ?? p.category;
+  /* "Saturdays-Food Delivery Platform | Divyakush Punjabi" — the form
+     the author specified for project titles: title and descriptor joined
+     by a hyphen, the byline after a pipe. */
   const candidates = what
     ? [
-        `${p.title} — ${what} · ${NAME}`,
-        `${p.title} — ${what}`,
+        `${p.title}-${what} | ${NAME}`,
+        `${p.title}-${what}`,
         /* A descriptor is the reason this page is findable at all, so it
            outranks the category on the way down. Only when neither fits
            does the title fall back to the bare name. */
-        ...(p.descriptor && p.category ? [`${p.title} — ${p.category}`] : []),
-        `${p.title} · ${NAME}`,
+        ...(p.descriptor && p.category ? [`${p.title}-${p.category}`] : []),
+        `${p.title} | ${NAME}`,
       ]
-    : [`${p.title} · ${NAME}`];
+    : [`${p.title} | ${NAME}`];
   return candidates.find((c) => encoded(c) <= 65) ?? p.title;
 }
 
