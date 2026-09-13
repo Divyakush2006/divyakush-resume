@@ -1,7 +1,7 @@
 {
   "projects": {
-    "hash": "1793865fc8df851a",
-    "date": "2026-09-05T12:45:56.165Z",
+    "hash": "189dea41c33b0053",
+    "date": "2026-09-13T08:18:01.897Z",
     "file": "src/lib/projects.ts"
   },
   "insights": {
@@ -20,8 +20,8 @@
     "file": "src/lib/roles.ts"
   },
   "faq": {
-    "hash": "34db163f3aac1cb7",
-    "date": "2026-09-02T11:30:02.697Z",
+    "hash": "b6172b7d8e060c27",
+    "date": "2026-09-10T06:39:48.420Z",
     "file": "src/lib/faq.ts"
   }
 }

@@ -158,6 +158,35 @@ export const clamp = (s: string, n = 158) => {
   return t.slice(0, t.lastIndexOf(' ', n - 1)).replace(/[,;:—-]$/, '') + '…';
 };
 
+/* A project's description, written for the place it is read alone.
+
+   Every summary in projects.ts is a bare noun phrase — "A consumer
+   food-delivery platform — customer app, restaurant API…" — because on
+   the home deck and the mobile list it sits directly under the
+   project's title, and a sentence repeating the name there would read
+   as a stutter. That is right for the card.
+
+   It is wrong for a search result, where the description is the snippet
+   under a blue link and nothing above it supplies the subject. Searched
+   for "saturdays food", the Saturdays page's own snippet did not contain
+   the word Saturdays, and neither did any of the 698 words of its prose.
+   A result whose text never names the thing the query names is the
+   weakest candidate for it, and the snippet is also where a query term
+   gets bolded.
+
+   So the name is supplied here, at the one boundary where the summary
+   leaves the card, rather than by rewriting ten summaries the design
+   depends on. "A …" becomes "<Title> is a …"; anything else gets the
+   title as a label; a summary that already names its project is left
+   alone. */
+export function describe(p: Project): string {
+  const s = p.summary || p.lede;
+  if (s.includes(p.title)) return clamp(s);
+  return clamp(
+    /^(A|An) /.test(s) ? `${p.title} is ${s[0].toLowerCase()}${s.slice(1)}` : `${p.title}: ${s}`,
+  );
+}
+
 /* ── Dates ────────────────────────────────────────────────────────
    The site prints dates the way a person writes them — "2024",
    "Jun 2025" — because that is what belongs in a caption rail. A
@@ -553,7 +582,7 @@ const products: Node[] = PRODUCT_SLUGS.flatMap((slug) => {
       url: `${ORIGIN}/projects/${p.slug}`,
       ...(p.category ? { applicationCategory: p.category } : {}),
       operatingSystem: 'Web',
-      description: clamp(p.summary || p.lede),
+      description: describe(p),
       author: { '@id': `${ORIGIN}/#person` },
       ...(p.stack?.length ? { keywords: p.stack.join(', ') } : {}),
       /* No `sameAs` to the product's own domain.
@@ -847,7 +876,7 @@ export function projectSeo(slug: string): RouteSeo | null {
     title: projectTitle(p),
     /* Rendered by `scripts/generate-og-image.mjs`, one per project. */
     card: `/og/${p.slug}.png`,
-    description: clamp(p.summary || p.lede),
+    description: describe(p),
     /* Title and descriptor, not the bare title — the same string the
        entity carries as `alternateName` and the same one the internal
        anchors use. The visible hero says "Saturdays"; the document is
@@ -874,7 +903,7 @@ export function projectSeo(slug: string): RouteSeo | null {
       person,
       logo,
       website,
-      webPage(url, p.title, clamp(p.summary || p.lede), {
+      webPage(url, p.title, describe(p), {
         breadcrumb: { '@id': `${ORIGIN}${url}#breadcrumb` },
         mainEntity: { '@id': `${ORIGIN}${url}#app` },
       }),

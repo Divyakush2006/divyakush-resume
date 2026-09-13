@@ -440,7 +440,7 @@ export const PROJECTS: Project[] = [
     status: 'Live in production',
     summary:
       'A consumer food-delivery platform — customer app, restaurant API, rider layer and operator console on one Django backend.',
-    lede: 'A food-delivery platform serving four user classes from one codebase — customers, restaurant owners, delivery partners and platform admins. A React and TypeScript front end over a Django 5 / DRF backend of sixteen domain apps, with live PhonePe payments, an explicit order state machine, WebSocket tracking, and a server-to-server integration with the DineGuru restaurant POS.',
+    lede: 'Saturdays is a food-delivery platform serving four user classes from one codebase — customers, restaurant owners, delivery partners and platform admins. A React and TypeScript front end over a Django 5 / DRF backend of sixteen domain apps, with live PhonePe payments, an explicit order state machine, WebSocket tracking, and a server-to-server integration with the DineGuru restaurant POS.',
     stack: ['React', 'TypeScript', 'Django', 'PostgreSQL', 'Celery', 'PhonePe'],
     proof: { value: 'Live', label: 'In production, taking real payments' },
     cover: saturdaysCover,
