@@ -578,7 +578,7 @@ const products: Node[] = PRODUCT_SLUGS.flatMap((slug) => {
       /* Same alternate name the project page states at this `@id`. Two
          pages describing one entity have to agree, or the `@id` is
          doing nothing. */
-      ...(p.descriptor ? { alternateName: `${p.title} — ${p.descriptor}` } : {}),
+      ...projectAltNames(p),
       url: `${ORIGIN}/projects/${p.slug}`,
       ...(p.category ? { applicationCategory: p.category } : {}),
       operatingSystem: 'Web',
@@ -826,6 +826,22 @@ function topicNodes(p: Project) {
   };
 }
 
+/* The names a project is published under besides its bare title: the
+   "<title> — <descriptor>" form, then any aliases the product is
+   genuinely known by. One function because two nodes describe each
+   project — the item on the home graph and the project page's own — and
+   they share an `@id`, so they have to state the same names or the
+   `@id` stops meaning one thing. A single name stays a string; several
+   become the array schema.org allows. */
+function projectAltNames(p: Project): { alternateName?: string | string[] } {
+  const names = [
+    ...(p.descriptor ? [`${p.title} — ${p.descriptor}`] : []),
+    ...(p.aliases ?? []),
+  ];
+  if (!names.length) return {};
+  return { alternateName: names.length === 1 ? names[0] : names };
+}
+
 function projectTitle(p: Project): string {
   const encoded = (s: string) => s.replace(/&/g, '&amp;').length;
   const what = p.descriptor ?? p.category;
@@ -898,7 +914,20 @@ export function projectSeo(slug: string): RouteSeo | null {
     body: [
       p.lede,
       p.summary,
+      /* The problem statement and the architecture table are two of the
+         page's own chapters, and until now the crawlable document left
+         both out — it jumped from the summary straight to the build
+         notes. They are the plainest description of what the product
+         does and what it runs on, so they go in under the same titles
+         the rendered chapters use. */
+      ...(p.problem ? [{ heading: 'What it had to solve' }, p.problem] : []),
       ...(p.build ?? []).flatMap((b) => [{ heading: b.title }, b.body]),
+      ...(p.architecture?.length
+        ? [
+            { heading: 'How the pieces sit together' },
+            ...p.architecture.map((a) => `${a.layer}: ${a.detail}`),
+          ]
+        : []),
       ...(p.features ?? []).flatMap((f) => [{ heading: f.title }, f.body]),
       ...(p.facts ?? []).map((f) => `${f.label}: ${f.value}`),
     ].filter(Boolean) as Block[],
@@ -971,7 +1000,7 @@ export function projectSeo(slug: string): RouteSeo | null {
            companies; "Netra — AI Surveillance System" is one thing.
            This is the same job `alternateName` does for the Person node,
            where it carries the mononym. */
-        ...(p.descriptor ? { alternateName: `${p.title} — ${p.descriptor}` } : {}),
+        ...projectAltNames(p),
         description: clamp(p.lede || p.summary, 400),
         url: `${ORIGIN}${url}`,
         author: { '@id': `${ORIGIN}/#person` },

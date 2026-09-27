@@ -110,7 +110,7 @@ export const FAQ: FaqEntry[] = [
     answer: [
       'Production systems, in three areas: multi-tenant SaaS, semantic retrieval, and machine learning ' +
         'services that are actually served rather than left in a notebook.',
-      'Four of them are live products. Saturdays is a consumer food-delivery platform with discovery, ' +
+      'Four of them are live products. Saturdays is a consumer food delivery platform with discovery, ' +
         'ordering and PhonePe and Stripe payments. DineGuru is multi-tenant restaurant SaaS covering ' +
         'inventory, kitchen ticketing, recipe costing, procurement and billing analytics on one core. ' +
         'GovernAI Research Atlas is a semantic search unifying papers, repositories and governance ' +

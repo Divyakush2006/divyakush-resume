@@ -398,6 +398,15 @@ export interface Project {
    * grounding turn out to be the same act.
    */
   sourceOrganization?: { name: string; url: string; sameAs?: string[] };
+  /**
+   * Other names the product itself is known by — short forms of its own
+   * branding, not keyword variants. Published as `alternateName` beside
+   * the "<title> — <descriptor>" form, on both nodes that describe the
+   * project. The same test as the person's ALTERNATE_NAMES in seo.ts: a
+   * string belongs here only if someone would genuinely call the product
+   * that.
+   */
+  aliases?: string[];
   year: string;
   status: string;
   /** One line, used on the deck frame. */
@@ -432,28 +441,33 @@ export const PROJECTS: Project[] = [
   /* ── 1 ─────────────────────────────────────────────────────────── */
   {
     slug: 'saturdays',
-    topics: ['Online food ordering', 'Point of sale'],
+    topics: ['Food delivery', 'Online food ordering', 'Point of sale'],
     title: 'Saturdays',
     category: 'Consumer food delivery',
     descriptor: 'Food Delivery Platform',
+    /* The product's own site titles itself "Saturdays — Food Delivery",
+       and "Saturdays Food" is how that is shortened in speech. Both are
+       names for this product; neither is a keyword. */
+    aliases: ['Saturdays Food Delivery', 'Saturdays Food'],
     year: '2026 — present',
     status: 'Live in production',
     summary:
-      'A consumer food-delivery platform — customer app, restaurant API, rider layer and operator console on one Django backend.',
-    lede: 'Saturdays is a food-delivery platform serving four user classes from one codebase — customers, restaurant owners, delivery partners and platform admins. A React and TypeScript front end over a Django 5 / DRF backend of sixteen domain apps, with live PhonePe payments, an explicit order state machine, WebSocket tracking, and a server-to-server integration with the DineGuru restaurant POS.',
+      'A consumer food delivery platform — customer app, restaurant API, rider layer and operator console on one Django backend.',
+    lede: 'Saturdays is a food delivery platform serving four user classes from one codebase — customers, restaurant owners, delivery partners and platform admins. A React and TypeScript front end over a Django 5 / DRF backend of sixteen domain apps, with live PhonePe payments, an explicit order state machine, WebSocket tracking, and a server-to-server integration with the DineGuru restaurant POS.',
     stack: ['React', 'TypeScript', 'Django', 'PostgreSQL', 'Celery', 'PhonePe'],
     proof: { value: 'Live', label: 'In production, taking real payments' },
     cover: saturdaysCover,
-    links: [
-      { label: 'saturdays.co.in', href: 'https://saturdays.co.in', kind: 'live' },
-    ],
+    /* No outbound link. This page is the Saturdays write-up and stands
+       on its own: nothing on it points readers or ranking signal at the
+       product's domain. The hero renders no link row when this is empty. */
+    links: [],
     facts: [
       { label: 'Status', value: 'Live in production' },
       { label: 'Domain apps', value: 'Sixteen' },
       { label: 'Payments', value: 'PhonePe V2' },
     ],
     problem:
-      'Ordering food is a funnel with one honest measure of success: an order that is paid for. Every step between opening a menu and a confirmed payment is a place to lose someone — a slow catalogue, a cart that forgets itself, a checkout that fails silently on a bad connection. Four user classes then have to share that one record: the customer tracking it, the restaurant preparing it, the rider carrying it, and the platform accounting for it. The hard part is not any one of those screens. It is that all four read and write the same order, from different clients, at the same time — and only one of them can be trusted with the money.',
+      'For a food delivery platform like Saturdays, ordering is a funnel with one honest measure of success: an order that is paid for. Every step between opening a menu and a confirmed payment is a place to lose someone — a slow catalogue, a cart that forgets itself, a checkout that fails silently on a bad connection. Four user classes then have to share that one record: the customer tracking it, the restaurant preparing it, the rider carrying it, and the platform accounting for it. The hard part is not any one of those screens. It is that all four read and write the same order, from different clients, at the same time — and only one of them can be trusted with the money.',
     build: [
       {
         title: 'Server-side truth for anything that matters',

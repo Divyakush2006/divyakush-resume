@@ -432,6 +432,12 @@ function Hero({ project }: { project: Project }) {
           {standfirst}
         </motion.p>
 
+        {/* No row at all when a project lists no links. An empty flex box
+            here still carries its top margin, which would leave a gap
+            under the standfirst on the one page that has nothing to
+            link to (Saturdays, which is written up without pointing at
+            the product's domain). */}
+        {project.links.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
@@ -470,6 +476,7 @@ function Hero({ project }: { project: Project }) {
             </a>
           ))}
         </motion.div>
+        )}
       </motion.div>
     </header>
   );
@@ -774,7 +781,13 @@ function Gallery({
                   <Picture
                     sizes="(min-width: 640px) 48vw, 95vw"
                     src={item.src}
-                    alt={item.caption}
+                    /* Prefixed with the project's name. The caption reads
+                       well under the picture, where the page already says
+                       what it is looking at; as alt text it is read alone
+                       — by image search and by a screen reader landing
+                       on the figure — and "one search across every
+                       kitchen" does not say which product it shows. */
+                    alt={`${project.title} — ${item.caption}`}
                     {...contentImage()}
                     className="aspect-[16/10] w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.02]"
                   />
